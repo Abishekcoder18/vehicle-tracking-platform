@@ -70,3 +70,86 @@ The platform will provide the following features:
 
 7. Notifications
    - Stores alerts such as trip completion, delays, maintenance reminders, and emergency notifications.
+
+---
+
+## 7. User Roles & Permissions
+
+### Admin
+- Manage all users
+- Manage vehicles
+- Manage drivers
+- View all trips
+- View reports and analytics
+- Manage system settings
+
+### Fleet Manager
+- Create and assign trips
+- Assign drivers and vehicles
+- Monitor live vehicle locations
+- View fleet reports
+
+### Driver
+- Login to the system
+- View assigned trips
+- Update trip status
+- Share live vehicle location
+
+---
+
+## 8. Success Criteria
+
+The project will be considered successful if:
+
+- Users can securely log in based on their roles.
+- Fleet Managers can assign vehicles and drivers to trips.
+- Drivers can update trip progress and location.
+- Vehicle locations can be viewed in real time.
+- Admin can monitor the complete fleet through a dashboard.
+- The system provides accurate trip history and reports.
+
+---
+
+## 9. Out of Scope
+
+The following features are not included in the initial version:
+
+- Online payment integration
+- Fuel expense management
+- Vehicle maintenance scheduling
+- Mobile application
+- IoT hardware integration
+- Advanced AI route optimization (planned as future enhancement)
+
+---
+
+## 10. Chosen Track
+
+Python (FastAPI)
+
+Frontend:
+- React
+- Tailwind CSS
+- Axios
+- Leaflet
+
+Backend:
+- FastAPI
+- SQLAlchemy
+- Pydantic
+
+Database:
+- PostgreSQL
+
+Future Enhancement:
+- AI-based Route Optimization
+- Predictive Maintenance
+# System Architecture
+
+## Overview
+
+The Vehicle Tracking & Fleet Monitoring Platform follows a three-tier architecture consisting of a React frontend, FastAPI backend, PostgreSQL database, and future AI module for route optimization and predictive maintenance.
+
+## Architecture Diagram
+
+![System Architecture](diagrams/architecture-v1.png)
