@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
+import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const login = async (e) => {
     e.preventDefault();
@@ -17,95 +19,81 @@ function Login() {
         password,
       });
 
-      if (!res.data.access_token) {
-        alert("Invalid Email or Password");
-        return;
-      }
-
       localStorage.setItem("token", res.data.access_token);
 
       navigate("/dashboard");
-    } catch (err) {
-      console.log(err.response);
-      alert("Invalid Email or Password");
+    } catch {
+      setError("Invalid email or password");
     }
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f7fa",
-      }}
-    >
-      <form
-        onSubmit={login}
-        style={{
-          width: "400px",
-          background: "#fff",
-          padding: "40px",
-          borderRadius: "12px",
-          border: "1px solid #ddd",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            color: "#2563eb",
-            marginBottom: "30px",
-          }}
-        >
-          Vehicle Tracking Platform
-        </h1>
+    <div className="login-page">
+      <div className="login-card">
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "12px",
-            marginBottom: "15px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
-          }}
-        />
+        <div className="logo">
+          🚚
+        </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "12px",
-            marginBottom: "20px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
-          }}
-        />
+        <h1>Vehicle Tracking Platform</h1>
 
-        <button
-          type="submit"
-          style={{
-            width: "100%",
-            padding: "12px",
-            background: "#2563eb",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "16px",
-            fontWeight: "600",
-          }}
-        >
-          Login
-        </button>
-      </form>
+        <p className="subtitle">
+          Fleet Monitoring & Logistics Management System
+        </p>
+
+        <h2>Welcome Back</h2>
+
+        <p className="small">
+          Please login to continue
+        </p>
+
+        <form onSubmit={login}>
+
+          <label>Email Address</label>
+
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e)=>setEmail(e.target.value)}
+          />
+
+          <label>Password</label>
+
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e)=>setPassword(e.target.value)}
+          />
+
+          {error && (
+            <p className="error">{error}</p>
+          )}
+
+          <button type="submit">
+            Login
+          </button>
+
+          <p
+            style={{
+              textAlign: "center",
+              marginTop: "20px",
+            }}
+          >
+            Don't have an account?{" "}
+            <Link to="/signup">
+              Sign Up
+            </Link>
+          </p>
+
+        </form>
+
+        <div className="footer">
+          © 2026 Vehicle Tracking Platform
+        </div>
+
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { FaTruck } from "react-icons/fa";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -9,25 +10,26 @@ function Navbar() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "20px 30px",
-        background: "#ffffff",
-        borderBottom: "1px solid #ddd",
-        marginBottom: "25px",
-      }}
-    >
-      <h2 style={{ color: "#2563eb" }}>
-        🚚 Vehicle Tracking Platform
-      </h2>
+    <nav className="navbar">
 
-      <button className="btn" onClick={logout}>
+      <div className="navbar-left">
+
+        <div className="navbar-logo">
+          <FaTruck />
+        </div>
+
+        <div>
+          <h2>Vehicle Tracking Platform</h2>
+          <p>Fleet Monitoring Dashboard</p>
+        </div>
+
+      </div>
+
+      <button className="logout-btn" onClick={logout}>
         Logout
       </button>
-    </div>
+
+    </nav>
   );
 }
 

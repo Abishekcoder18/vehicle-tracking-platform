@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import "../App.css";
 import Navbar from "../components/Navbar";
+import { FaTruck, FaRoute } from "react-icons/fa";
 
 function Dashboard() {
   const [dashboard, setDashboard] = useState({
@@ -65,21 +66,24 @@ function Dashboard() {
       <Navbar />
 
       <div className="container">
-        <h1 className="title">
-          Vehicle Tracking & Fleet Monitoring Platform
-        </h1>
 
         <div className="section">
           <h2>Dashboard</h2>
 
           <div className="cards">
             <div className="card">
-              <h3>Total Vehicles</h3>
+              <div className="card-header">
+                <FaTruck className="card-icon" />
+                <span>Total Vehicles</span>
+              </div>
               <h1>{dashboard.total_vehicles}</h1>
             </div>
 
             <div className="card">
-              <h3>Total Trips</h3>
+              <div className="card-header">
+                <FaRoute className="card-icon" />
+                <span>Total Trips</span>
+              </div>
               <h1>{dashboard.total_trips}</h1>
             </div>
           </div>
