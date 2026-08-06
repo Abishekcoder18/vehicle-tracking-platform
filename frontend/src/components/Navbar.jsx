@@ -15,7 +15,7 @@ function Navbar() {
       <div className="navbar-left">
 
         <div className="navbar-logo">
-          <FaTruck />
+          <FaTruck size={28} />
         </div>
 
         <div>

@@ -1,56 +1,82 @@
-# 🚚 Vehicle Tracking & Fleet Monitoring Platform
+# 🚚 Vehicle Tracking Platform
 
-A full-stack Vehicle Tracking & Fleet Monitoring Platform developed using **React**, **FastAPI**, and **PostgreSQL**. The application allows users to manage vehicles, create and monitor trips, and view fleet statistics through a simple dashboard. This project is developed as part of the Capstone Project and will be enhanced in future phases with JWT authentication, live GPS tracking, AI-powered route optimization, and cloud deployment.
+A full-stack **Vehicle Tracking Platform** developed using **React**, **FastAPI**, and **PostgreSQL**. The application enables fleet managers to securely manage vehicles, monitor trips, and visualize fleet statistics through a modern web dashboard.
+
+This project is developed as part of the **Capstone Project** and follows a scalable architecture that will support future enhancements such as live GPS tracking, AI-based route optimization, Docker containerization, and AWS deployment.
 
 ---
 
 # 📌 Problem Statement
 
-Develop a full-stack web application that enables fleet managers to efficiently manage vehicles, monitor trips, and maintain fleet information using PostgreSQL. The application provides a user-friendly interface with REST APIs for vehicle and trip management while maintaining a scalable architecture for future enhancements.
+Develop a full-stack web application that enables fleet managers to efficiently manage vehicles, monitor trips, and maintain fleet information using PostgreSQL. The application provides secure user authentication, REST APIs, and a responsive frontend while maintaining a scalable architecture for future enhancements.
 
 ---
 
 # 🎯 Objectives
 
+- Secure user authentication
 - Manage vehicle information
 - Create and monitor trips
-- Display fleet statistics through a dashboard
+- Display fleet statistics
 - Store data securely using PostgreSQL
 - Develop REST APIs using FastAPI
 - Build a responsive frontend using React
-- Prepare the application for future AI and cloud integration
+- Prepare the system for AI and cloud integration
 
 ---
 
-# ✨ Current Features (MVP)
+# ✨ Current Features
 
-## Dashboard
+## 🔐 Authentication
 
-- View Total Vehicles
-- View Total Trips
+- User Registration
+- User Login
+- JWT Authentication
+- Protected API Endpoints
+- Protected Dashboard Routes
+- Logout Functionality
 
-## Vehicle Management
+---
+
+## 📊 Dashboard
+
+- Total Vehicles
+- Total Trips
+- Responsive Dashboard Cards
+
+---
+
+## 🚚 Vehicle Management
 
 - Add Vehicle
 - View Vehicle List
 - Delete Vehicle
 
-## Trip Management
+---
+
+## 🛣 Trip Management
 
 - Create Trip
 - View Trip List
 - Delete Trip
 
-## Backend
+---
 
-- REST APIs
-- Swagger API Documentation
+## ⚙ Backend
+
+- FastAPI REST APIs
+- JWT Authentication
 - SQLAlchemy ORM
+- Pydantic Validation
+- Swagger Documentation
 
-## Database
+---
+
+## 🗄 Database
 
 - PostgreSQL Integration
-- Data Persistence
+- SQLAlchemy ORM
+- Persistent Data Storage
 
 ---
 
@@ -59,34 +85,48 @@ Develop a full-stack web application that enables fleet managers to efficiently 
 ## Frontend
 
 - React
+- React Router DOM
 - Axios
+- React Icons
 - CSS
+
+---
 
 ## Backend
 
 - FastAPI
 - SQLAlchemy
 - Pydantic
+- Python-JOSE
+- Passlib (bcrypt)
 - Uvicorn
+
+---
 
 ## Database
 
 - PostgreSQL
 
+---
+
 ## Development Tools
 
-- VS Code
 - Git
 - GitHub
+- VS Code
 - pgAdmin
+- Postman
+- Swagger UI
+
+---
 
 ## Future Technologies
 
-- JWT Authentication
 - Leaflet Maps
+- OpenStreetMap
 - Docker
 - AWS
-- AI Modules
+- AI Route Optimization
 
 ---
 
@@ -98,24 +138,29 @@ vehicle-tracking-platform/
 ├── frontend/
 │   ├── public/
 │   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
 │   ├── package.json
 │   └── vite.config.js
 │
 ├── backend/
 │   ├── app/
 │   │   ├── api/
+│   │   ├── core/
 │   │   ├── database/
 │   │   ├── models/
 │   │   ├── schemas/
-│   │   ├── services/
-│   │   └── core/
+│   │   └── services/
 │   │
 │   ├── main.py
-│   ├── .env
-│   └── .gitignore
+│   ├── .env.example
+│   └── requirements.txt
 │
 ├── docs/
-│   ├── database/
 │   ├── diagrams/
 │   └── screenshots/
 │
@@ -126,19 +171,39 @@ vehicle-tracking-platform/
 
 # 🗄 Database
 
-Current Tables
+### Tables
 
 - users
 - vehicles
 - trips
 
-Database: PostgreSQL
+Database:
 
-ORM: SQLAlchemy
+- PostgreSQL
+
+ORM:
+
+- SQLAlchemy
 
 ---
 
 # 📡 API Endpoints
+
+## Authentication
+
+```
+POST /auth/register
+```
+
+Register a new user.
+
+```
+POST /auth/login
+```
+
+Authenticate user and generate JWT token.
+
+---
 
 ## Dashboard
 
@@ -146,7 +211,7 @@ ORM: SQLAlchemy
 GET /dashboard/
 ```
 
-Returns total number of vehicles and trips.
+Returns dashboard statistics.
 
 ---
 
@@ -154,21 +219,9 @@ Returns total number of vehicles and trips.
 
 ```
 GET /vehicles/
-```
-
-Retrieve all vehicles.
-
-```
 POST /vehicles/
-```
-
-Create a new vehicle.
-
-```
 DELETE /vehicles/{id}
 ```
-
-Delete a vehicle.
 
 ---
 
@@ -176,21 +229,9 @@ Delete a vehicle.
 
 ```
 GET /trips/
-```
-
-Retrieve all trips.
-
-```
 POST /trips/
-```
-
-Create a new trip.
-
-```
 DELETE /trips/{id}
 ```
-
-Delete a trip.
 
 ---
 
@@ -214,7 +255,7 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
+Runs on:
 
 ```
 http://localhost:5173
@@ -231,18 +272,18 @@ python -m venv .venv
 
 .\.venv\Scripts\activate
 
-pip install fastapi uvicorn sqlalchemy psycopg2-binary python-dotenv pydantic
+pip install -r requirements.txt
 
 uvicorn main:app --reload
 ```
 
-Backend runs at:
+Runs on:
 
 ```
 http://127.0.0.1:8000
 ```
 
-Swagger Documentation:
+Swagger:
 
 ```
 http://127.0.0.1:8000/docs
@@ -252,44 +293,47 @@ http://127.0.0.1:8000/docs
 
 # 📐 System Design
 
-The project documentation includes:
-
-- Architecture Diagram
-- ER Diagram
-- Module/Class Diagram
-
-Location:
+Included inside:
 
 ```
 docs/diagrams/
 ```
 
+- Architecture Diagram
+- ER Diagram
+- Module Diagram
+
 ---
 
 # 📷 Screenshots
 
-The following screenshots are included in:
+Location:
 
 ```
 docs/screenshots/
 ```
 
+Screenshots included:
+
+- Login Page
+- Signup Page
 - Dashboard
 - Vehicle Management
 - Trip Management
-- Swagger API
+- Swagger UI
 - PostgreSQL Database
 
 ---
 
-# 🚀 Project Status
+# ✅ Completed Features
 
-## ✅ Completed
-
-- Git Repository Setup
 - React Frontend
 - FastAPI Backend
 - PostgreSQL Database
+- JWT Authentication
+- User Registration
+- User Login
+- Protected Routes
 - Dashboard
 - Vehicle CRUD
 - Trip CRUD
@@ -298,30 +342,31 @@ docs/screenshots/
 - Swagger Documentation
 - Architecture Diagram
 - ER Diagram
-- Module/Class Diagram
+- Module Diagram
 
 ---
 
-## 🚧 In Progress
+# 🚧 Upcoming Features
 
-- JWT Authentication
-- UI Improvements
+- Search Vehicles
+- Edit Vehicle
+- Edit Trip
 - Input Validation
-- Better User Experience
+- Better Error Handling
+- Dashboard Analytics
 
 ---
 
-## 🔮 Future Enhancements
+# 🔮 Future Enhancements
 
-- User Authentication (JWT)
-- Role-Based Access Control
 - Live Vehicle Tracking
-- Maps Integration (Leaflet + OpenStreetMap)
-- Notifications
+- Leaflet Maps Integration
 - Route Optimization using AI
 - Predictive Maintenance
+- Notifications
+- Role-Based Access Control
 - Docker Containerization
-- AWS Cloud Deployment
+- AWS Deployment
 
 ---
 

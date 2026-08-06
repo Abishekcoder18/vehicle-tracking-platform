@@ -95,30 +95,47 @@ function Dashboard() {
           <h2>Vehicle Management</h2>
 
           <div className="form-grid">
-            <input
-              placeholder="Registration Number"
-              value={vehicle.registration_number}
-              onChange={(e) =>
-                setVehicle({ ...vehicle, registration_number: e.target.value })
-              }
-            />
+            <div>
+              <label>Registration Number</label>
+              <input
+                placeholder="Enter Registration Number"
+                value={vehicle.registration_number}
+                onChange={(e) =>
+                  setVehicle({
+                    ...vehicle,
+                    registration_number: e.target.value,
+                  })
+                }
+              />
+            </div>
 
-            <input
-              placeholder="Model"
-              value={vehicle.model}
-              onChange={(e) =>
-                setVehicle({ ...vehicle, model: e.target.value })
-              }
-            />
+            <div>
+              <label>Vehicle Model</label>
+              <input
+                placeholder="Enter Vehicle Model"
+                value={vehicle.model}
+                onChange={(e) =>
+                  setVehicle({
+                    ...vehicle,
+                    model: e.target.value,
+                  })
+                }
+              />
+            </div>
 
-            <input
-              className="full"
-              placeholder="Vehicle Type"
-              value={vehicle.vehicle_type}
-              onChange={(e) =>
-                setVehicle({ ...vehicle, vehicle_type: e.target.value })
-              }
-            />
+            <div className="full">
+              <label>Vehicle Type</label>
+              <input
+                placeholder="Enter Vehicle Type"
+                value={vehicle.vehicle_type}
+                onChange={(e) =>
+                  setVehicle({
+                    ...vehicle,
+                    vehicle_type: e.target.value,
+                  })
+                }
+              />
+            </div>
 
             <div className="full button-center">
               <button className="btn" onClick={addVehicle}>
@@ -168,37 +185,49 @@ function Dashboard() {
           <h2>Trip Management</h2>
 
           <div className="form-grid">
-            <input
-              placeholder="Source"
-              value={trip.source}
-              onChange={(e) =>
-                setTrip({ ...trip, source: e.target.value })
-              }
-            />
+            <div>
+              <label>Source</label>
+              <input
+                placeholder="Enter Source"
+                value={trip.source}
+                onChange={(e) =>
+                  setTrip({ ...trip, source: e.target.value })
+                }
+              />
+            </div>
 
-            <input
-              placeholder="Destination"
-              value={trip.destination}
-              onChange={(e) =>
-                setTrip({ ...trip, destination: e.target.value })
-              }
-            />
+            <div>
+              <label>Destination</label>
+              <input
+                placeholder="Enter Destination"
+                value={trip.destination}
+                onChange={(e) =>
+                  setTrip({ ...trip, destination: e.target.value })
+                }
+              />
+            </div>
 
-            <input
-              placeholder="Driver Name"
-              value={trip.driver_name}
-              onChange={(e) =>
-                setTrip({ ...trip, driver_name: e.target.value })
-              }
-            />
+            <div>
+              <label>Driver Name</label>
+              <input
+                placeholder="Enter Driver Name"
+                value={trip.driver_name}
+                onChange={(e) =>
+                  setTrip({ ...trip, driver_name: e.target.value })
+                }
+              />
+            </div>
 
-            <input
-              placeholder="Vehicle Number"
-              value={trip.vehicle_number}
-              onChange={(e) =>
-                setTrip({ ...trip, vehicle_number: e.target.value })
-              }
-            />
+            <div>
+              <label>Vehicle Number</label>
+              <input
+                placeholder="Enter Vehicle Number"
+                value={trip.vehicle_number}
+                onChange={(e) =>
+                  setTrip({ ...trip, vehicle_number: e.target.value })
+                }
+              />
+            </div>
 
             <div className="full button-center">
               <button className="btn" onClick={addTrip}>
@@ -243,6 +272,11 @@ function Dashboard() {
             </tbody>
           </table>
         </div>
+
+        <footer className="footer">
+          © 2026 Vehicle Tracking Platform | React • FastAPI • PostgreSQL
+        </footer>
+
       </div>
     </>
   );

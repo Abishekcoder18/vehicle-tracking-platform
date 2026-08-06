@@ -62,11 +62,12 @@ body {
 }
 
 .section h2 {
-  text-align: center;
-  font-size: 34px;
+  font-size: 30px;
   color: #111827;
   font-weight: 700;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e5e7eb;
 }
 
 /* ===========================
@@ -95,8 +96,8 @@ body {
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
 }
 
 .card-header {
@@ -132,6 +133,13 @@ body {
 
 .full {
   grid-column: 1 / span 2;
+}
+
+.form-grid label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
 }
 
 .form-grid input {
@@ -187,13 +195,14 @@ input {
 
 .btn:hover {
   background: #1d4ed8;
+  transform: translateY(-2px);
 }
 
 .delete-btn {
   background: white;
-  color: #dc2626;
-  border: 1px solid #dc2626;
-  border-radius: 6px;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
   padding: 8px 18px;
   cursor: pointer;
   font-weight: 600;
@@ -201,7 +210,7 @@ input {
 }
 
 .delete-btn:hover {
-  background: #dc2626;
+  background: #ef4444;
   color: white;
 }
 
@@ -216,42 +225,47 @@ button {
 h3 {
   margin-top: 35px;
   margin-bottom: 20px;
-  color: #2563eb;
-  font-size: 28px;
-  text-align: center;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 table {
   width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin-top: 15px;
-  box-sizing: border-box;
+  margin-top: 25px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
 }
 
-thead {
-  background: #111827;
-  color: white;
+thead tr {
+  height: 55px;
 }
 
 th {
-  padding: 15px;
-  font-size: 17px;
+  background: #111827;
+  color: white;
   font-weight: 600;
+  font-size: 15px;
 }
 
+th,
 td {
-  padding: 14px;
+  padding: 18px;
   text-align: center;
-  border: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 tbody tr:nth-child(even) {
-  background: #f8fafc;
+  background: #f9fafb;
 }
 
 tbody tr:hover {
-  background: #eef5ff;
+  background: #eff6ff;
+  transition: 0.2s;
 }
 
 /* ===========================
@@ -350,4 +364,17 @@ tbody tr:hover {
 
 .logout-btn:hover {
   background: #1d4ed8;
+}
+
+/* ==========================
+   FOOTER
+========================== */
+
+.footer {
+  margin-top: 40px;
+  padding: 20px 0;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
 }
