@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from app.schemas.vehicle import VehicleCreate
 from app.core.dependencies import verify_token
 from app.database.database import get_db
 from app.models.vehicle import Vehicle
-from app.schemas.vehicle import VehicleCreate
 
 router = APIRouter(prefix="/vehicles", tags=["Vehicles"])
 
@@ -19,6 +18,7 @@ def create_vehicle(
         registration_number=vehicle.registration_number,
         model=vehicle.model,
         vehicle_type=vehicle.vehicle_type,
+        status=vehicle.status,
     )
 
     db.add(new_vehicle)
@@ -51,3 +51,31 @@ def delete_vehicle(
     db.commit()
 
     return {"message": "Vehicle deleted successfully"}
+
+
+@router.put("/{vehicle_id}")
+def update_vehicle(
+    vehicle_id: int,
+    updated_vehicle: VehicleCreate,
+    db: Session = Depends(get_db),
+    user=Depends(verify_token)
+):
+    vehicle = db.query(Vehicle).filter(
+        Vehicle.id == vehicle_id
+    ).first()
+
+    if vehicle is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Vehicle not found"
+        )
+
+    vehicle.registration_number = updated_vehicle.registration_number
+    vehicle.model = updated_vehicle.model
+    vehicle.vehicle_type = updated_vehicle.vehicle_type
+    vehicle.status = updated_vehicle.status
+
+    db.commit()
+    db.refresh(vehicle)
+
+    return vehicle

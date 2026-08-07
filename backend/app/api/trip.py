@@ -52,3 +52,28 @@ def delete_trip(
     db.commit()
 
     return {"message": "Trip deleted successfully"}
+
+@router.put("/{trip_id}")
+def update_trip(
+    trip_id: int,
+    updated_trip: TripCreate,
+    db: Session = Depends(get_db),
+    user=Depends(verify_token)
+):
+    trip = db.query(Trip).filter(Trip.id == trip_id).first()
+
+    if trip is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Trip not found"
+        )
+
+    trip.source = updated_trip.source
+    trip.destination = updated_trip.destination
+    trip.driver_name = updated_trip.driver_name
+    trip.vehicle_number = updated_trip.vehicle_number
+
+    db.commit()
+    db.refresh(trip)
+
+    return trip

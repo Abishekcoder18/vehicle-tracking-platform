@@ -5,6 +5,7 @@ class VehicleCreate(BaseModel):
     registration_number: str
     model: str
     vehicle_type: str
+    status: str = "Available"
 
 
 class VehicleResponse(BaseModel):

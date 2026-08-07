@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import "../App.css";
 import Navbar from "../components/Navbar";
-import { FaTruck, FaRoute } from "react-icons/fa";
+import { FaTruck, FaRoute, FaEdit, FaTrash } from "react-icons/fa";
 
 function Dashboard() {
   const [dashboard, setDashboard] = useState({
@@ -17,6 +17,7 @@ function Dashboard() {
     registration_number: "",
     model: "",
     vehicle_type: "",
+    status: "Available",
   });
 
   const [trip, setTrip] = useState({
@@ -25,6 +26,9 @@ function Dashboard() {
     driver_name: "",
     vehicle_number: "",
   });
+
+  const [editingVehicleId, setEditingVehicleId] = useState(null);
+  const [editingTripId, setEditingTripId] = useState(null);
 
   const loadData = async () => {
     const dashboardRes = await api.get("/dashboard/");
@@ -41,24 +45,63 @@ function Dashboard() {
   }, []);
 
   const addVehicle = async () => {
-    await api.post("/vehicles/", vehicle);
+    if (editingVehicleId) {
+      await api.put(`/vehicles/${editingVehicleId}`, vehicle);
+      setEditingVehicleId(null);
+    } else {
+      await api.post("/vehicles/", vehicle);
+    }
+
     setVehicle({
       registration_number: "",
       model: "",
       vehicle_type: "",
+      status: "Available",
     });
+
     loadData();
   };
 
+  const editVehicle = (v) => {
+    console.log("Edit clicked:", v);
+
+    setVehicle({
+      registration_number: v.registration_number,
+      model: v.model,
+      vehicle_type: v.vehicle_type,
+      status: v.status,
+    });
+
+    setEditingVehicleId(v.id);
+  };
+
   const addTrip = async () => {
-    await api.post("/trips/", trip);
+    if (editingTripId) {
+      await api.put(`/trips/${editingTripId}`, trip);
+      setEditingTripId(null);
+    } else {
+      await api.post("/trips/", trip);
+    }
+
     setTrip({
       source: "",
       destination: "",
       driver_name: "",
       vehicle_number: "",
     });
+
     loadData();
+  };
+
+  const editTrip = (t) => {
+    setTrip({
+      source: t.source,
+      destination: t.destination,
+      driver_name: t.driver_name,
+      vehicle_number: t.vehicle_number,
+    });
+
+    setEditingTripId(t.id);
   };
 
   return (
@@ -137,9 +180,26 @@ function Dashboard() {
               />
             </div>
 
+            <div className="full">
+              <label>Status</label>
+              <select
+                value={vehicle.status || "Available"}
+                onChange={(e) =>
+                  setVehicle({
+                    ...vehicle,
+                    status: e.target.value,
+                  })
+                }
+              >
+                <option value="Available">Available</option>
+                <option value="On Trip">On Trip</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+            </div>
+
             <div className="full button-center">
               <button className="btn" onClick={addVehicle}>
-                Add Vehicle
+                {editingVehicleId ? "Update Vehicle" : "Add Vehicle"}
               </button>
             </div>
           </div>
@@ -152,26 +212,44 @@ function Dashboard() {
                 <th>Registration</th>
                 <th>Model</th>
                 <th>Type</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
 
             <tbody>
+              {console.log("Vehicles data:", vehicles)}
               {vehicles.map((v) => (
                 <tr key={v.id}>
                   <td>{v.registration_number}</td>
                   <td>{v.model}</td>
                   <td>{v.vehicle_type}</td>
                   <td>
-                    <button
-                      className="delete-btn"
-                      onClick={async () => {
-                        await api.delete(`/vehicles/${v.id}`);
-                        loadData();
-                      }}
-                    >
-                      Delete
-                    </button>
+                    <span className={`status-badge ${v.status?.toLowerCase().replace(" ", "-") || "available"}`}>
+                      {v.status || "Available"}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        className="edit-btn"
+                        onClick={() => editVehicle(v)}
+                        title="Edit"
+                      >
+                        <FaEdit />
+                      </button>
+
+                      <button
+                        className="delete-btn"
+                        onClick={async () => {
+                          await api.delete(`/vehicles/${v.id}`);
+                          loadData();
+                        }}
+                        title="Delete"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -231,7 +309,7 @@ function Dashboard() {
 
             <div className="full button-center">
               <button className="btn" onClick={addTrip}>
-                Create Trip
+                {editingTripId ? "Update Trip" : "Create Trip"}
               </button>
             </div>
           </div>
@@ -257,15 +335,26 @@ function Dashboard() {
                   <td>{t.driver_name}</td>
                   <td>{t.vehicle_number}</td>
                   <td>
-                    <button
-                      className="delete-btn"
-                      onClick={async () => {
-                        await api.delete(`/trips/${t.id}`);
-                        loadData();
-                      }}
-                    >
-                      Delete
-                    </button>
+                    <div className="action-buttons">
+                      <button
+                        className="edit-btn"
+                        onClick={() => editTrip(t)}
+                        title="Edit Trip"
+                      >
+                        <FaEdit />
+                      </button>
+
+                      <button
+                        className="delete-btn"
+                        onClick={async () => {
+                          await api.delete(`/trips/${t.id}`);
+                          loadData();
+                        }}
+                        title="Delete Trip"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
