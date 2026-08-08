@@ -425,6 +425,7 @@ tbody tr:hover {
   text-align: center;
 }
 
+/* Vehicle Status */
 .status-badge.available {
   background: #dcfce7;
   color: #166534;
@@ -438,4 +439,37 @@ tbody tr:hover {
 .status-badge.maintenance {
   background: #fee2e2;
   color: #991b1b;
+}
+
+/* Trip Status */
+.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.running {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-badge.completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* ==========================
+Google Map
+========================== */
+
+.google-map-container {
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+}
+
+.google-map-container > div {
+  width: 100%;
+  height: 100%;
 }

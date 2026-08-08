@@ -2,12 +2,19 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import "../App.css";
 import Navbar from "../components/Navbar";
+import GoogleMap from "../components/GoogleMap";
 import { FaTruck, FaRoute, FaEdit, FaTrash } from "react-icons/fa";
 
 function Dashboard() {
   const [dashboard, setDashboard] = useState({
     total_vehicles: 0,
+    available_vehicles: 0,
+    running_vehicles: 0,
+    maintenance_vehicles: 0,
     total_trips: 0,
+    pending_trips: 0,
+    running_trips: 0,
+    completed_trips: 0,
   });
 
   const [vehicles, setVehicles] = useState([]);
@@ -25,6 +32,7 @@ function Dashboard() {
     destination: "",
     driver_name: "",
     vehicle_number: "",
+    status: "Pending",
   });
 
   const [editingVehicleId, setEditingVehicleId] = useState(null);
@@ -88,6 +96,7 @@ function Dashboard() {
       destination: "",
       driver_name: "",
       vehicle_number: "",
+      status: "Pending",
     });
 
     loadData();
@@ -99,6 +108,7 @@ function Dashboard() {
       destination: t.destination,
       driver_name: t.driver_name,
       vehicle_number: t.vehicle_number,
+      status: t.status || "Pending",
     });
 
     setEditingTripId(t.id);
@@ -124,10 +134,58 @@ function Dashboard() {
 
             <div className="card">
               <div className="card-header">
+                <FaTruck className="card-icon" />
+                <span>Available Vehicles</span>
+              </div>
+              <h1>{dashboard.available_vehicles}</h1>
+            </div>
+
+            <div className="card">
+              <div className="card-header">
+                <FaTruck className="card-icon" />
+                <span>Running Vehicles</span>
+              </div>
+              <h1>{dashboard.running_vehicles}</h1>
+            </div>
+
+            <div className="card">
+              <div className="card-header">
+                <FaTruck className="card-icon" />
+                <span>Maintenance Vehicles</span>
+              </div>
+              <h1>{dashboard.maintenance_vehicles}</h1>
+            </div>
+
+            <div className="card">
+              <div className="card-header">
                 <FaRoute className="card-icon" />
                 <span>Total Trips</span>
               </div>
               <h1>{dashboard.total_trips}</h1>
+            </div>
+
+            <div className="card">
+              <div className="card-header">
+                <FaRoute className="card-icon" />
+                <span>Pending Trips</span>
+              </div>
+              <h1>{dashboard.pending_trips}</h1>
+            </div>
+
+            <div className="card">
+              <div className="card-header">
+                <FaRoute className="card-icon" />
+                <span>Running Trips</span>
+              </div>
+              <h1>{dashboard.running_trips}</h1>
+            </div>
+
+            <div className="card">
+              <div className="card-header">
+                <FaRoute className="card-icon" />
+                <span>Completed Trips</span>
+              </div>
+              <h1>{dashboard.completed_trips}</h1>
             </div>
           </div>
         </div>
@@ -307,6 +365,23 @@ function Dashboard() {
               />
             </div>
 
+            <div>
+              <label>Trip Status</label>
+              <select
+                value={trip.status}
+                onChange={(e) =>
+                  setTrip({
+                    ...trip,
+                    status: e.target.value,
+                  })
+                }
+              >
+                <option value="Pending">Pending</option>
+                <option value="Running">Running</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+
             <div className="full button-center">
               <button className="btn" onClick={addTrip}>
                 {editingTripId ? "Update Trip" : "Create Trip"}
@@ -323,6 +398,7 @@ function Dashboard() {
                 <th>Destination</th>
                 <th>Driver</th>
                 <th>Vehicle</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -334,6 +410,11 @@ function Dashboard() {
                   <td>{t.destination}</td>
                   <td>{t.driver_name}</td>
                   <td>{t.vehicle_number}</td>
+                  <td>
+                    <span className={`status-badge ${t.status?.toLowerCase() || "pending"}`}>
+                      {t.status || "Pending"}
+                    </span>
+                  </td>
                   <td>
                     <div className="action-buttons">
                       <button
@@ -360,6 +441,13 @@ function Dashboard() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div style={{ height: "10px" }}></div>
+
+        <div className="section">
+          <h2>Vehicle Tracking</h2>
+          <GoogleMap />
         </div>
 
         <footer className="footer">

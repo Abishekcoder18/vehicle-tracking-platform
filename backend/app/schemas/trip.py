@@ -6,6 +6,7 @@ class TripCreate(BaseModel):
     destination: str
     driver_name: str
     vehicle_number: str
+    status: str = "Pending"
 
 
 class TripResponse(BaseModel):
