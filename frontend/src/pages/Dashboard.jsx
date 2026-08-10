@@ -447,7 +447,7 @@ function Dashboard() {
 
         <div className="section">
           <h2>Vehicle Tracking</h2>
-          <GoogleMap trips={trips} />
+          <GoogleMap trips={trips} vehicles={vehicles} />
         </div>
 
         <footer className="footer">

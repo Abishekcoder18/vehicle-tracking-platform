@@ -11,16 +11,19 @@ Logistics and Fleet Management
 ## 3. Who are the users?
 
 ### 1. Admin
+
 - Manages the entire platform.
 - Adds and manages vehicles, drivers, and fleet managers.
 - Monitors overall fleet performance.
 
 ### 2. Fleet Manager
+
 - Assigns vehicles and drivers.
 - Creates and monitors trips.
 - Tracks vehicle locations and trip status.
 
 ### 3. Driver
+
 - Views assigned trips.
 - Updates trip progress.
 - Shares vehicle location during the trip.
@@ -31,84 +34,101 @@ Many logistics companies still rely on manual methods or disconnected systems to
 
 For example, if a delivery vehicle breaks down or gets stuck in traffic, the fleet manager may not know about it immediately, resulting in delayed deliveries and increased operational costs.
 
-This platform provides a centralized solution to manage vehicles, drivers, trips, and live tracking, helping companies improve fleet efficiency and make better operational decisions.
+This platform provides a centralized solution to manage vehicles, drivers, trips, and vehicle locations, helping companies improve fleet efficiency and make better operational decisions.
 
 ## 5. Proposed Solution
 
 The Vehicle Tracking & Fleet Monitoring Platform is a web-based application that helps logistics companies efficiently manage their fleet operations.
 
-The platform will provide the following features:
+The platform provides the following features:
 
 - Vehicle management (add, update, and monitor vehicles)
-- Driver management and assignment
+- Driver management
 - Trip creation and scheduling
-- Real-time vehicle tracking using maps
+- Vehicle location tracking using GPS coordinates
+- Interactive vehicle tracking using Google Maps
 - Fleet monitoring dashboard with trip status
-- Route history and trip reports
-- Notifications for delays or completed trips
+- Trip progress monitoring
+- Vehicle status validation
+- Secure user authentication using JWT
+- Protected REST APIs
+- GPS simulation for vehicle movement demonstration
 - AI-ready architecture for future route optimization and predictive maintenance
 
 ## 6. Core Entities / Database Tables
 
-1. Users
-   - Stores login information for Admins, Fleet Managers, and Drivers.
+### 1. Users
 
-2. Vehicles
-   - Stores vehicle details such as registration number, model, type, and status.
+- Stores user login information and authentication details.
+- Supports secure authentication and user role information.
 
-3. Drivers
-   - Stores driver information, license details, and contact information.
+### 2. Vehicles
 
-4. Trips
-   - Stores trip details including source, destination, assigned vehicle, assigned driver, and trip status.
+- Stores vehicle details such as registration number, model, type, and status.
 
-5. VehicleLocations
-   - Stores the latest GPS coordinates and timestamps for each vehicle.
+### 3. Drivers
 
-6. RouteHistory
-   - Stores completed trip routes and travel history.
+- Stores driver information, license details, contact information, and status.
 
-7. Notifications
-   - Stores alerts such as trip completion, delays, maintenance reminders, and emergency notifications.
+### 4. Trips
 
----
+- Stores trip details including source, destination, assigned vehicle, assigned driver, and trip status.
+
+### 5. VehicleLocations
+
+- Stores vehicle GPS coordinates, vehicle IDs, trip IDs, and timestamps for vehicle tracking.
+
+### Future Entities
+
+The following entities are planned for future enhancements:
+
+### 6. RouteHistory
+
+- Intended to store completed trip routes and travel history.
+
+### 7. Notifications
+
+- Intended to store alerts such as trip completion, delays, maintenance reminders, and emergency notifications.
 
 ## 7. User Roles & Permissions
 
 ### Admin
-- Manage all users
+
+- Manage users
 - Manage vehicles
 - Manage drivers
 - View all trips
-- View reports and analytics
+- View fleet information
 - Manage system settings
 
 ### Fleet Manager
+
 - Create and assign trips
 - Assign drivers and vehicles
-- Monitor live vehicle locations
-- View fleet reports
+- Monitor vehicle locations
+- View fleet information
+- Monitor trip status
 
 ### Driver
+
 - Login to the system
 - View assigned trips
 - Update trip status
-- Share live vehicle location
-
----
+- Share vehicle location during a trip
 
 ## 8. Success Criteria
 
 The project will be considered successful if:
 
-- Users can securely log in based on their roles.
-- Fleet Managers can assign vehicles and drivers to trips.
-- Drivers can update trip progress and location.
-- Vehicle locations can be viewed in real time.
-- Admin can monitor the complete fleet through a dashboard.
-- The system provides accurate trip history and reports.
-
----
+- Users can securely log in using authentication.
+- Fleet Managers can manage vehicles and drivers.
+- Fleet Managers can create and manage trips.
+- Vehicles can be assigned to trips with availability validation.
+- Vehicle locations can be stored and retrieved through REST APIs.
+- The latest vehicle location can be displayed on the dashboard.
+- Vehicle movement can be visualized on Google Maps.
+- Trip progress can be monitored through the dashboard.
+- The system provides a centralized platform for basic fleet monitoring.
 
 ## 9. Out of Scope
 
@@ -119,37 +139,57 @@ The following features are not included in the initial version:
 - Vehicle maintenance scheduling
 - Mobile application
 - IoT hardware integration
-- Advanced AI route optimization (planned as future enhancement)
+- Real GPS device integration
+- Advanced AI route optimization
+- Predictive maintenance
 
----
+These features may be considered for future project phases.
 
 ## 10. Chosen Track
 
 Python (FastAPI)
 
-Frontend:
-- React
-- Tailwind CSS
-- Axios
-- Leaflet
+### Frontend
 
-Backend:
+- React
+- React Router
+- Axios
+- React Icons
+- Vite
+- Google Maps Platform
+
+### Backend
+
 - FastAPI
 - SQLAlchemy
 - Pydantic
+- JWT Authentication
+- Passlib / Bcrypt
+- python-dotenv
 
-Database:
+### Database
+
 - PostgreSQL
 
-Future Enhancement:
+### Future Enhancements
+
 - AI-based Route Optimization
 - Predictive Maintenance
+- Real GPS Device Integration
+- Advanced Fleet Analytics
+- Traffic-aware routing
+- Weather-aware routing
+
 # System Architecture
 
 ## Overview
 
-The Vehicle Tracking & Fleet Monitoring Platform follows a three-tier architecture consisting of a React frontend, FastAPI backend, PostgreSQL database, and future AI module for route optimization and predictive maintenance.
+The Vehicle Tracking & Fleet Monitoring Platform follows a modular full-stack architecture consisting of a React frontend, FastAPI backend, PostgreSQL database, and Google Maps Platform for map-based vehicle visualization.
+
+The architecture is designed to support future enhancements such as real GPS device integration, AI-based route optimization, predictive maintenance, advanced analytics, and cloud deployment.
 
 ## Architecture Diagram
 
-![System Architecture](diagrams/architecture-v1.png)
+The system architecture diagram is maintained in:
+
+`docs/diagrams/architecture.drawio`

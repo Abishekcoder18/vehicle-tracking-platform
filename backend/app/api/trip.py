@@ -35,7 +35,17 @@ def create_trip(
                 detail="Vehicle is under maintenance and cannot start a trip"
             )
 
-        if vehicle.status == "On Trip":
+        # Check if another trip is actually running
+        existing_running_trip = (
+            db.query(Trip)
+            .filter(
+                Trip.vehicle_number == trip.vehicle_number,
+                Trip.status == "Running"
+            )
+            .first()
+        )
+
+        if existing_running_trip:
             raise HTTPException(
                 status_code=400,
                 detail="Vehicle is already assigned to another running trip"
@@ -121,12 +131,25 @@ def update_trip(
                 detail="Vehicle is under maintenance and cannot start a trip"
             )
 
-        if vehicle.status == "On Trip":
+        # Check if another trip is actually running
+        # IMPORTANT: Trip.id != trip_id excludes the current trip from the check
+        existing_running_trip = (
+            db.query(Trip)
+            .filter(
+                Trip.vehicle_number == updated_trip.vehicle_number,
+                Trip.status == "Running",
+                Trip.id != trip_id
+            )
+            .first()
+        )
+
+        if existing_running_trip:
             raise HTTPException(
                 status_code=400,
                 detail="Vehicle is already assigned to another running trip"
             )
 
+        # Vehicle is now assigned to this trip
         vehicle.status = "On Trip"
 
     trip.source = updated_trip.source

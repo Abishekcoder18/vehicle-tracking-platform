@@ -1,389 +1,420 @@
-# 🚚 Vehicle Tracking Platform
+# Vehicle Tracking & Fleet Monitoring Platform
 
-A full-stack **Vehicle Tracking Platform** developed using **React**, **FastAPI**, and **PostgreSQL**. The application enables fleet managers to securely manage vehicles, monitor trips, and visualize fleet statistics through a modern web dashboard.
+A full-stack Vehicle Tracking and Fleet Monitoring Platform developed using React, FastAPI, and PostgreSQL.
 
-This project is developed as part of the **Capstone Project** and follows a scalable architecture that will support future enhancements such as live GPS tracking, AI-based route optimization, Docker containerization, and AWS deployment.
+The system enables fleet managers to securely manage vehicles and drivers, create and monitor trips, track vehicle locations, and visualize active vehicle movement on an interactive Google Maps interface.
 
----
-
-# 📌 Problem Statement
-
-Develop a full-stack web application that enables fleet managers to efficiently manage vehicles, monitor trips, and maintain fleet information using PostgreSQL. The application provides secure user authentication, REST APIs, and a responsive frontend while maintaining a scalable architecture for future enhancements.
+This project is developed as part of the Capstone Project.
 
 ---
 
-# 🎯 Objectives
+## 1. Problem Statement
 
-- Secure user authentication
-- Manage vehicle information
-- Create and monitor trips
-- Display fleet statistics
-- Store data securely using PostgreSQL
-- Develop REST APIs using FastAPI
-- Build a responsive frontend using React
-- Prepare the system for AI and cloud integration
+Develop a full-stack web application that enables fleet managers to efficiently manage vehicles, drivers, trips, and fleet information using PostgreSQL.
+
+The application provides secure authentication, protected REST APIs, vehicle and trip management, GPS-based vehicle tracking, and a dashboard for monitoring active trips.
 
 ---
 
-# ✨ Current Features
+## 2. Objectives
 
-## 🔐 Authentication
-
-- User Registration
-- User Login
-- JWT Authentication
-- Protected API Endpoints
-- Protected Dashboard Routes
-- Logout Functionality
-
----
-
-## 📊 Dashboard
-
-- Total Vehicles
-- Total Trips
-- Responsive Dashboard Cards
+- Secure user authentication using JWT
+- Vehicle management
+- Driver management
+- Trip creation and monitoring
+- Vehicle location tracking
+- Interactive Google Maps visualization
+- Trip progress monitoring
+- PostgreSQL data storage
+- REST APIs using FastAPI
+- Responsive frontend using React
+- Modular architecture for future enhancements
 
 ---
 
-## 🚚 Vehicle Management
+## 3. Current Features
 
-- Add Vehicle
-- View Vehicle List
-- Delete Vehicle
+### Authentication
+
+- User signup
+- User login
+- Password hashing
+- JWT authentication
+- Protected API endpoints
+
+### Vehicle Management
+
+- Add vehicles
+- Retrieve vehicles
+- Update vehicle status
+- Vehicle availability validation
+
+### Driver Management
+
+- Add drivers
+- Retrieve driver information
+- Driver status management
+
+### Trip Management
+
+- Create trips
+- Retrieve trips
+- Update trips
+- Delete trips
+- Pending to Running workflow
+- Running to Completed workflow
+- Vehicle assignment validation
+
+### Vehicle Tracking
+
+- Store vehicle GPS coordinates
+- Retrieve vehicle locations
+- Retrieve latest vehicle location
+- Track active vehicle movement
+- Display vehicle position on Google Maps
+- Calculate trip progress
+- GPS simulation
+- Start/Stop simulation
+
+### Dashboard
+
+- Fleet statistics
+- Vehicle information
+- Trip information
+- Active trip tracking
+- Live vehicle coordinates
+- Trip progress indicator
 
 ---
 
-## 🛣 Trip Management
+## 4. Technology Stack
 
-- Create Trip
-- View Trip List
-- Delete Trip
+### Frontend
 
----
-
-## ⚙ Backend
-
-- FastAPI REST APIs
-- JWT Authentication
-- SQLAlchemy ORM
-- Pydantic Validation
-- Swagger Documentation
-
----
-
-## 🗄 Database
-
-- PostgreSQL Integration
-- SQLAlchemy ORM
-- Persistent Data Storage
-
----
-
-# 🛠 Tech Stack
-
-## Frontend
-
-- React
-- React Router DOM
+- React 19
+- React Router
 - Axios
 - React Icons
-- CSS
+- @vis.gl/react-google-maps
+- Vite
+- ESLint
 
----
+### Backend
 
-## Backend
-
+- Python
 - FastAPI
+- Uvicorn
 - SQLAlchemy
 - Pydantic
-- Python-JOSE
-- Passlib (bcrypt)
-- Uvicorn
+- python-jose
+- Passlib
+- python-dotenv
 
----
-
-## Database
+### Database
 
 - PostgreSQL
 
----
+### Authentication
 
-## Development Tools
+- JWT
+- Bcrypt password hashing
 
-- Git
-- GitHub
-- VS Code
-- pgAdmin
-- Postman
-- Swagger UI
+### External Services
+
+- Google Maps Platform
 
 ---
 
-## Future Technologies
-
-- Leaflet Maps
-- OpenStreetMap
-- Docker
-- AWS
-- AI Route Optimization
-
----
-
-# 📂 Project Structure
+## 5. Project Structure
 
 ```text
 vehicle-tracking-platform/
-
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   │
-│   ├── package.json
-│   └── vite.config.js
+│
+├── .gitignore
+├── README.md
+├── Problem_Statement.md
 │
 ├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── core/
-│   │   ├── database/
-│   │   ├── models/
-│   │   ├── schemas/
-│   │   └── services/
-│   │
-│   ├── main.py
 │   ├── .env.example
-│   └── requirements.txt
+│   ├── requirements.txt
+│   ├── main.py
+│   │
+│   └── app/
+│       ├── api/
+│       │   ├── auth.py
+│       │   ├── dashboard.py
+│       │   ├── driver.py
+│       │   ├── trip.py
+│       │   ├── vehicle.py
+│       │   └── vehicle_location.py
+│       │
+│       ├── core/
+│       │   ├── dependencies.py
+│       │   └── security.py
+│       │
+│       ├── database/
+│       │   └── database.py
+│       │
+│       ├── models/
+│       │   ├── driver.py
+│       │   ├── trip.py
+│       │   ├── user.py
+│       │   ├── vehicle.py
+│       │   └── vehicle_location.py
+│       │
+│       └── schemas/
+│           ├── driver.py
+│           ├── trip.py
+│           ├── user.py
+│           ├── vehicle.py
+│           └── vehicle_location.py
 │
-├── docs/
-│   ├── diagrams/
-│   └── screenshots/
+├── frontend/
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   │
+│   └── src/
+│       ├── components/
+│       │   ├── GoogleMap.jsx
+│       │   ├── Navbar.jsx
+│       │   └── ProtectedRoute.jsx
+│       │
+│       ├── pages/
+│       │   ├── Dashboard.jsx
+│       │   ├── Login.jsx
+│       │   └── Signup.jsx
+│       │
+│       └── services/
+│           └── api.js
 │
-└── README.md
+└── docs/
+    ├── database/
+    │   └── ER_Diagram.md
+    │
+    └── diagrams/
+        ├── architecture.drawio
+        ├── ER-diagram.drawio
+        └── class-diagram.drawio
 ```
 
----
+6. Prerequisites
 
-# 🗄 Database
+Install the following before running the project:
 
-### Tables
+Python 3.12+
+Node.js and npm
+PostgreSQL
+Google Maps API key
+7. Database Setup
 
-- users
-- vehicles
-- trips
+The application uses PostgreSQL.
 
-Database:
+Create a database named:
 
-- PostgreSQL
+vehicle_tracking_db
 
-ORM:
+For example:
 
-- SQLAlchemy
+CREATE DATABASE vehicle_tracking_db;
 
----
+Make sure PostgreSQL is running before starting the backend.
 
-# 📡 API Endpoints
+8. Backend Setup
 
-## Authentication
-
-```
-POST /auth/register
-```
-
-Register a new user.
-
-```
-POST /auth/login
-```
-
-Authenticate user and generate JWT token.
-
----
-
-## Dashboard
-
-```
-GET /dashboard/
-```
-
-Returns dashboard statistics.
-
----
-
-## Vehicles
-
-```
-GET /vehicles/
-POST /vehicles/
-DELETE /vehicles/{id}
-```
-
----
-
-## Trips
-
-```
-GET /trips/
-POST /trips/
-DELETE /trips/{id}
-```
-
----
-
-# 🚀 Installation
-
-## Clone Repository
-
-```bash
-git clone https://github.com/Abishekcoder18/vehicle-tracking-platform.git
-```
-
----
-
-## Frontend
-
-```bash
-cd frontend
-
-npm install
-
-npm run dev
-```
-
-Runs on:
-
-```
-http://localhost:5173
-```
-
----
-
-## Backend
-
-```bash
-cd backend
+From the project root:
 
 python -m venv .venv
 
-.\.venv\Scripts\activate
+Activate the virtual environment on Windows:
 
-pip install -r requirements.txt
+.\.venv\Scripts\Activate.ps1
+
+Install backend dependencies:
+
+pip install -r backend\requirements.txt
+9. Backend Environment Variables
+
+Create:
+
+backend/.env
+
+Use the example file as a template:
+
+backend/.env.example
+
+The .env file should contain:
+
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/vehicle_tracking_db
+
+Replace YOUR_PASSWORD with the password of your local PostgreSQL installation.
+
+Never commit the real .env file or database credentials to Git.
+
+10. Start the Backend
+
+From the project root:
+
+cd backend
+
+Start FastAPI:
 
 uvicorn main:app --reload
-```
 
-Runs on:
+The backend will normally run at:
 
-```
 http://127.0.0.1:8000
-```
 
-Swagger:
+Swagger API documentation:
 
-```
 http://127.0.0.1:8000/docs
-```
+11. Frontend Setup
 
----
+Open a second terminal.
 
-# 📐 System Design
+From the project root:
 
-Included inside:
+cd frontend
 
-```
-docs/diagrams/
-```
+Install dependencies:
 
-- Architecture Diagram
-- ER Diagram
-- Module Diagram
+npm install
+12. Frontend Environment Variables
 
----
+Create:
 
-# 📷 Screenshots
+frontend/.env
 
-Location:
+Add:
 
-```
-docs/screenshots/
-```
+VITE_GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
 
-Screenshots included:
+Replace the value with your Google Maps API key.
 
-- Login Page
-- Signup Page
-- Dashboard
-- Vehicle Management
-- Trip Management
-- Swagger UI
-- PostgreSQL Database
+Never commit the real API key to Git.
 
----
+13. Start the Frontend
 
-# ✅ Completed Features
+From the frontend directory:
 
-- React Frontend
-- FastAPI Backend
-- PostgreSQL Database
-- JWT Authentication
-- User Registration
-- User Login
-- Protected Routes
-- Dashboard
-- Vehicle CRUD
-- Trip CRUD
-- REST APIs
-- SQLAlchemy ORM
-- Swagger Documentation
-- Architecture Diagram
-- ER Diagram
-- Module Diagram
+npm run dev
 
----
+Vite will provide the local development URL, normally:
 
-# 🚧 Upcoming Features
+http://localhost:5173
+14. Running the Complete Application
 
-- Search Vehicles
-- Edit Vehicle
-- Edit Trip
-- Input Validation
-- Better Error Handling
-- Dashboard Analytics
+Two terminals are required.
 
----
+Terminal 1 - Backend
+.\.venv\Scripts\Activate.ps1
+cd backend
+uvicorn main:app --reload
+Terminal 2 - Frontend
+cd frontend
+npm install
+npm run dev
 
-# 🔮 Future Enhancements
+Open the frontend URL provided by Vite.
 
-- Live Vehicle Tracking
-- Leaflet Maps Integration
-- Route Optimization using AI
-- Predictive Maintenance
-- Notifications
-- Role-Based Access Control
-- Docker Containerization
-- AWS Deployment
+15. API Documentation
 
----
+FastAPI provides interactive API documentation at:
 
-# 👨‍💻 Author
+http://127.0.0.1:8000/docs
 
-**S. P. Abishek Edwin Raj**
+The API currently includes:
 
-B.Tech – Artificial Intelligence and Data Science
+Authentication
+Dashboard
+Vehicles
+Drivers
+Trips
+Vehicle Locations
+16. Vehicle Tracking Flow
+
+The current tracking workflow is:
+
+Running Trip
+     |
+     v
+Google Maps Route
+     |
+     v
+GPS Simulator
+     |
+     v
+Vehicle Location API
+     |
+     v
+PostgreSQL
+     |
+     v
+Latest Vehicle Location
+     |
+     v
+React Dashboard
+     |
+     v
+Vehicle Marker + Trip Progress
+
+The GPS simulator can be started and stopped from the dashboard.
+
+17. Documentation
+
+Project documentation and diagrams are available under:
+
+docs/
+
+The project includes:
+
+System Architecture Diagram
+Entity Relationship Diagram
+Class/Module Diagram
+18. Current Implementation Status
+Completed
+User signup
+User login
+JWT authentication
+Protected APIs
+Vehicle management
+Driver management
+Trip management
+Vehicle status validation
+Vehicle location storage
+Latest vehicle location API
+Google Maps route display
+GPS simulation
+Live vehicle marker
+Trip progress calculation
+Start/Stop simulation
+Dashboard statistics
+Future Enhancements
+Real GPS device integration
+Route optimization
+AI-based route optimization
+Traffic-aware routing
+Weather-aware routing
+Notifications
+Advanced analytics
+Docker containerization
+AWS deployment
+19. Author
+
+S. P. Abishek Edwin Raj
+
+B.Tech - Artificial Intelligence and Data Science
 
 J.J. College of Engineering and Technology
 
-GitHub:
-
-https://github.com/Abishekcoder18
-
----
-
-# 📄 License
+20. License
 
 This project is developed for educational and academic purposes as part of the Capstone Project.
+
+
+### After saving
+
+Run:
+
+```powershell
+Get-Content README.md

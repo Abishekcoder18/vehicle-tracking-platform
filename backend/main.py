@@ -6,11 +6,15 @@ from app.database.database import engine, Base
 from app.models.user import User
 from app.models.vehicle import Vehicle
 from app.models.trip import Trip
+from app.models.driver import Driver
+from app.models.vehicle_location import VehicleLocation
 
 from app.api.auth import router as auth_router
 from app.api.vehicle import router as vehicle_router
 from app.api.trip import router as trip_router
 from app.api.dashboard import router as dashboard_router
+from app.api.driver import router as driver_router
+from app.api.vehicle_location import router as vehicle_location_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,6 +32,8 @@ app.include_router(auth_router)
 app.include_router(vehicle_router)
 app.include_router(trip_router)
 app.include_router(dashboard_router)
+app.include_router(driver_router)
+app.include_router(vehicle_location_router)
 
 
 @app.get("/")
