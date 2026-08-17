@@ -16,6 +16,13 @@ from app.api.dashboard import router as dashboard_router
 from app.api.driver import router as driver_router
 from app.api.vehicle_location import router as vehicle_location_router
 
+from app.models.role import Role
+from app.models.vehicle_type import VehicleType
+from app.models.trip_status_history import TripStatusHistory
+from app.models.route_history import RouteHistory
+from app.models.notification import Notification
+from app.models.incident import Incident
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Vehicle Tracking API")
