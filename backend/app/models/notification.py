@@ -8,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
 )
+from sqlalchemy.orm import relationship
 
 from app.database.database import Base
 
@@ -53,3 +54,10 @@ class Notification(Base):
         default=datetime.utcnow,
         nullable=False
     )
+
+    user = relationship("User")
+    trip = relationship(
+        "Trip",
+        back_populates="notifications"
+    )
+    vehicle = relationship("Vehicle")

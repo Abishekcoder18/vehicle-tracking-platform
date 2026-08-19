@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     JSON,
 )
+from sqlalchemy.orm import relationship
 
 from app.database.database import Base
 
@@ -40,4 +41,9 @@ class RouteHistory(Base):
         DateTime,
         default=datetime.utcnow,
         nullable=False
+    )
+
+    trip = relationship(
+        "Trip",
+        back_populates="route_history"
     )

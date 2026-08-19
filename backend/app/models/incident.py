@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
 )
+from sqlalchemy.orm import relationship
 
 from app.database.database import Base
 
@@ -55,3 +56,13 @@ class Incident(Base):
     )
 
     resolved_at = Column(DateTime, nullable=True)
+
+    vehicle = relationship("Vehicle")
+    trip = relationship(
+        "Trip",
+        back_populates="incidents"
+    )
+    reported_by_user = relationship(
+        "User",
+        foreign_keys=[reported_by]
+    )

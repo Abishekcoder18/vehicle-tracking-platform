@@ -1,4 +1,7 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from datetime import datetime
+
 from app.database.database import Base
 
 
@@ -6,7 +9,37 @@ class Driver(Base):
     __tablename__ = "drivers"
 
     id = Column(Integer, primary_key=True, index=True)
+
     name = Column(String, nullable=False)
+
     phone = Column(String, nullable=False)
-    license_number = Column(String, unique=True, nullable=False)
-    status = Column(String, default="Available", nullable=False)
+
+    license_number = Column(
+        String,
+        unique=True,
+        nullable=False
+    )
+
+    status = Column(
+        String,
+        default="Available",
+        nullable=False
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False,
+        unique=True,
+        index=True
+    )
+
+    user = relationship(
+        "User",
+        back_populates="driver"
+    )
+
+    trips = relationship(
+        "Trip",
+        back_populates="driver"
+    )

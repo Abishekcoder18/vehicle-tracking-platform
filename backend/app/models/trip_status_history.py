@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+
 from app.database.database import Base
 
 
@@ -32,3 +34,13 @@ class TripStatusHistory(Base):
     )
 
     remarks = Column(String(500), nullable=True)
+
+    trip = relationship(
+        "Trip",
+        back_populates="status_history"
+    )
+
+    changed_by_user = relationship(
+        "User",
+        foreign_keys=[changed_by]
+    )
