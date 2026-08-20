@@ -27,7 +27,7 @@ def dashboard(db: Session = Depends(get_db)):
         Trip.status == "Pending"
     ).count()
     running_trips = db.query(Trip).filter(
-        Trip.status == "Running"
+        Trip.status == "Active"
     ).count()
     completed_trips = db.query(Trip).filter(
         Trip.status == "Completed"

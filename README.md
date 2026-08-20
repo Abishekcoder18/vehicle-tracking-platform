@@ -10,9 +10,9 @@ This project is developed as part of the Capstone Project.
 
 ## 1. Problem Statement
 
-Develop a full-stack web application that enables fleet managers to efficiently manage vehicles, drivers, trips, and fleet information using PostgreSQL.
-
-The application provides secure authentication, protected REST APIs, vehicle and trip management, GPS-based vehicle tracking, and a dashboard for monitoring active trips.
+Many logistics companies rely on manual or disconnected systems to manage vehicles, drivers, and trips.
+This makes real-time vehicle tracking, trip monitoring, and fleet management difficult and inefficient.
+Our platform provides a centralized system for vehicle/driver management, trip monitoring, and live GPS-based vehicle tracking.
 
 ---
 

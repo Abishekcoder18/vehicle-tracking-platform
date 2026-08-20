@@ -3,11 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database.database import engine, Base
 
-from app.models.user import User
-from app.models.vehicle import Vehicle
-from app.models.trip import Trip
-from app.models.driver import Driver
-from app.models.vehicle_location import VehicleLocation
+# Import all models so SQLAlchemy registers every relationship.
+from app import models
 
 from app.api.auth import router as auth_router
 from app.api.vehicle import router as vehicle_router
@@ -16,16 +13,12 @@ from app.api.dashboard import router as dashboard_router
 from app.api.driver import router as driver_router
 from app.api.vehicle_location import router as vehicle_location_router
 
-from app.models.role import Role
-from app.models.vehicle_type import VehicleType
-from app.models.trip_status_history import TripStatusHistory
-from app.models.route_history import RouteHistory
-from app.models.notification import Notification
-from app.models.incident import Incident
 
 Base.metadata.create_all(bind=engine)
 
+
 app = FastAPI(title="Vehicle Tracking API")
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,6 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(auth_router)
 app.include_router(vehicle_router)

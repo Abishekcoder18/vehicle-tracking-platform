@@ -5,6 +5,7 @@ class DriverCreate(BaseModel):
     name: str
     phone: str
     license_number: str
+    user_id: int
     status: str = "Available"
 
 
@@ -13,6 +14,7 @@ class DriverResponse(BaseModel):
     name: str
     phone: str
     license_number: str
+    user_id: int
     status: str
 
     class Config:
