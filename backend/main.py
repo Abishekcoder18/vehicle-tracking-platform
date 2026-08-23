@@ -12,6 +12,7 @@ from app.api.trip import router as trip_router
 from app.api.dashboard import router as dashboard_router
 from app.api.driver import router as driver_router
 from app.api.vehicle_location import router as vehicle_location_router
+from app.api.trip_status_history import router as trip_status_history_router
 
 
 Base.metadata.create_all(bind=engine)
@@ -35,6 +36,7 @@ app.include_router(trip_router)
 app.include_router(dashboard_router)
 app.include_router(driver_router)
 app.include_router(vehicle_location_router)
+app.include_router(trip_status_history_router)
 
 
 @app.get("/")
