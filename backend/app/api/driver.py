@@ -5,6 +5,7 @@ from app.core.dependencies import verify_token
 from app.database.database import get_db
 from app.models.driver import Driver
 from app.models.user import User
+from app.models.trip import Trip
 from app.schemas.driver import DriverCreate, DriverResponse
 
 
@@ -187,16 +188,33 @@ def delete_driver(
         )
 
     active_trip = (
-        db.query(Driver)
-        .filter(Driver.id == driver_id)
+        db.query(Trip)
+        .filter(
+            Trip.driver_id == driver_id,
+            Trip.status == "Active"
+        )
         .first()
     )
 
-    if active_trip.status == "On Trip":
+    if active_trip:
         raise HTTPException(
             status_code=400,
-            detail="Driver is currently on a trip and cannot be deleted"
+            detail="Driver is currently assigned to an active trip and cannot be deleted"
         )
+
+    trip_count = (
+        db.query(Trip)
+        .filter(Trip.driver_id == driver_id)
+        .count()
+    )
+
+    if trip_count > 0:
+        driver.status = "Inactive"
+        db.commit()
+
+        return {
+            "message": "Driver has trip history and was marked inactive instead of deleted"
+        }
 
     db.delete(driver)
     db.commit()
@@ -204,3 +222,8 @@ def delete_driver(
     return {
         "message": "Driver deleted successfully"
     }
+
+
+
+
+
