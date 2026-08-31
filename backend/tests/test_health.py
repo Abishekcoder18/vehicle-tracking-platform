@@ -12,3 +12,4 @@ def test_health_endpoint():
     assert response.status_code == 200
     assert response.json()["status"] == "success"
     assert response.json()["database"] == "Connected"
+    assert set(response.json().keys()) == {"status", "database"}
