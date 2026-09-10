@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import verify_token
+from app.core.dependencies import require_roles, verify_token
 from app.database.database import get_db
 
 from app.models.trip import Trip
@@ -134,7 +134,7 @@ def create_status_history(
 def create_trip(
     trip: TripCreate,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     if trip.status not in ALLOWED_STATUSES:
         raise HTTPException(
@@ -212,7 +212,7 @@ def create_trip(
 )
 def get_trips(
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     return (
         db.query(Trip)
@@ -246,6 +246,38 @@ def get_trip(
             detail="Trip not found"
         )
 
+    user_role = user.get("role")
+
+    if user_role == "DRIVER":
+        current_user_id = get_current_user_id(
+            db,
+            user
+        )
+
+        driver = (
+            db.query(Driver)
+            .filter(Driver.user_id == current_user_id)
+            .first()
+        )
+
+        if driver is None:
+            raise HTTPException(
+                status_code=403,
+                detail="Driver profile not found"
+            )
+
+        if trip.driver_id != driver.id:
+            raise HTTPException(
+                status_code=403,
+                detail="You can only access your assigned trips"
+            )
+
+    elif user_role not in {"ADMIN", "FLEET_MANAGER"}:
+        raise HTTPException(
+            status_code=403,
+            detail="Insufficient permissions"
+        )
+
     return trip
 
 
@@ -261,7 +293,7 @@ def update_trip(
     trip_id: int,
     updated_trip: TripCreate,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     if updated_trip.status not in ALLOWED_STATUSES:
         raise HTTPException(
@@ -399,7 +431,7 @@ def update_trip(
 def delete_trip(
     trip_id: int,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     trip = (
         db.query(Trip)

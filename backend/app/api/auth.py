@@ -4,6 +4,7 @@ from passlib.context import CryptContext
 
 from app.database.database import SessionLocal
 from app.models.user import User
+from app.models.role import Role
 from app.schemas.user import UserCreate, UserLogin
 from app.core.security import create_access_token
 
@@ -64,11 +65,23 @@ def register(
 
     hashed_password = pwd_context.hash(user.password)
 
+    fleet_manager_role = (
+        db.query(Role)
+        .filter(Role.name == "FLEET_MANAGER")
+        .first()
+    )
+
+    if fleet_manager_role is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Default user role is not configured"
+        )
+
     new_user = User(
         username=user.username,
         email=user.email,
         password=hashed_password,
-        role_id=user.role_id
+        role_id=fleet_manager_role.id
     )
 
     db.add(new_user)

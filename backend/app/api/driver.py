@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import verify_token
+from app.core.dependencies import require_roles
 from app.database.database import get_db
 from app.models.driver import Driver
 from app.models.user import User
@@ -23,7 +23,7 @@ router = APIRouter(
 def create_driver(
     driver: DriverCreate,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     existing_driver = (
         db.query(Driver)
@@ -83,7 +83,7 @@ def create_driver(
 @router.get("/", response_model=list[DriverResponse])
 def get_drivers(
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     return db.query(Driver).all()
 
@@ -97,7 +97,7 @@ def update_driver(
     driver_id: int,
     updated_driver: DriverCreate,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     driver = (
         db.query(Driver)
@@ -173,7 +173,7 @@ def update_driver(
 def delete_driver(
     driver_id: int,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     driver = (
         db.query(Driver)
@@ -222,8 +222,3 @@ def delete_driver(
     return {
         "message": "Driver deleted successfully"
     }
-
-
-
-
-

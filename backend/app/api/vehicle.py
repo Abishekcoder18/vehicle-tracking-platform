@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from app.schemas.vehicle import VehicleCreate
-from app.core.dependencies import verify_token
+from app.core.dependencies import require_roles
 from app.database.database import get_db
 from app.models.vehicle import Vehicle
+
 
 router = APIRouter(prefix="/vehicles", tags=["Vehicles"])
 
@@ -12,7 +14,7 @@ router = APIRouter(prefix="/vehicles", tags=["Vehicles"])
 def create_vehicle(
     vehicle: VehicleCreate,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     new_vehicle = Vehicle(
         registration_number=vehicle.registration_number,
@@ -31,7 +33,7 @@ def create_vehicle(
 @router.get("/")
 def get_vehicles(
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     return db.query(Vehicle).all()
 
@@ -40,7 +42,7 @@ def get_vehicles(
 def delete_vehicle(
     vehicle_id: int,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
 
@@ -58,7 +60,7 @@ def update_vehicle(
     vehicle_id: int,
     updated_vehicle: VehicleCreate,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)
+    user=Depends(require_roles("ADMIN", "FLEET_MANAGER"))
 ):
     vehicle = db.query(Vehicle).filter(
         Vehicle.id == vehicle_id
