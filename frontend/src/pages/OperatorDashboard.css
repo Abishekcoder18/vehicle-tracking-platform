@@ -1,0 +1,556 @@
+.operator-dashboard {
+  min-height: 100vh;
+  display: flex;
+  background: #f4f7fb;
+}
+
+/* SIDEBAR */
+
+.operator-sidebar {
+  width: 245px;
+  background: #101827;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.operator-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #263247;
+}
+
+.operator-brand-icon {
+  width: 42px;
+  height: 42px;
+  background: #2563eb;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+}
+
+.operator-brand h1 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.operator-brand span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.operator-role {
+  background: #18243a;
+  border: 1px solid #293850;
+  border-radius: 11px;
+  padding: 14px;
+  margin: 20px 0 25px;
+}
+
+.operator-role small {
+  display: block;
+  color: #7f8da3;
+  font-size: 9px;
+  margin-bottom: 5px;
+}
+
+.operator-role strong {
+  font-size: 13px;
+}
+
+.operator-nav-title {
+  font-size: 10px;
+  color: #718096;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.operator-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  color: #aeb9c9;
+  font-size: 13px;
+}
+
+.operator-nav.active {
+  background: #2563eb;
+  color: white;
+}
+
+.operator-sidebar-bottom {
+  margin-top: auto;
+}
+
+.operator-sidebar-bottom button {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  color: #94a3b8;
+  text-align: left;
+  padding: 12px;
+  cursor: pointer;
+}
+
+/* MAIN */
+
+.operator-main {
+  flex: 1;
+  min-width: 0;
+  padding: 28px;
+}
+
+.operator-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+}
+
+.operator-header > div:first-child > span {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.operator-header h2 {
+  margin: 5px 0;
+  font-size: 25px;
+  color: #0f172a;
+}
+
+.operator-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.operator-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.operator-header-right small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.live-status {
+  color: #059669;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.live-status svg {
+  font-size: 7px;
+  margin-right: 5px;
+}
+
+.refresh-btn {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #dbe3ed;
+  background: white;
+  border-radius: 8px;
+  color: #475569;
+  cursor: pointer;
+}
+
+/* KPI */
+
+.operator-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.operator-kpi {
+  background: white;
+  border: 1px solid #dfe6ef;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.kpi-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon.blue {
+  color: #2563eb;
+  background: #edf3ff;
+}
+
+.kpi-icon.green {
+  color: #059669;
+  background: #eaf8f2;
+}
+
+.kpi-icon.orange {
+  color: #d97706;
+  background: #fff5df;
+}
+
+.kpi-icon.red {
+  color: #dc2626;
+  background: #fff0f0;
+}
+
+.operator-kpi span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.operator-kpi strong {
+  display: block;
+  font-size: 23px;
+  color: #0f172a;
+  margin: 2px 0;
+}
+
+.operator-kpi small {
+  color: #94a3b8;
+  font-size: 9px;
+}
+
+/* PANELS */
+
+.operator-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.operator-panel {
+  background: white;
+  border: 1px solid #dfe6ef;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.operator-grid .operator-panel {
+  margin-bottom: 0;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.panel-heading span:first-child {
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.panel-heading h3 {
+  margin: 4px 0 0;
+  font-size: 17px;
+  color: #0f172a;
+}
+
+.map-live {
+  color: #059669 !important;
+  font-size: 10px !important;
+}
+
+.map-live svg {
+  font-size: 6px;
+}
+
+/* MAP */
+
+.operator-map {
+  height: 390px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ALERT */
+
+.alert-count {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #fff0f0;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.operator-alert {
+  display: flex;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #f1dede;
+  background: #fffafa;
+  border-radius: 9px;
+}
+
+.alert-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #fff0f0;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.operator-alert strong {
+  display: block;
+  font-size: 12px;
+  color: #1e293b;
+}
+
+.operator-alert p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 11px;
+}
+
+/* VEHICLES */
+
+.operator-vehicle-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.operator-vehicle {
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 15px;
+}
+
+.vehicle-main-icon {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  background: #edf3ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vehicle-info {
+  margin: 12px 0;
+}
+
+.vehicle-info strong {
+  display: block;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.vehicle-info span {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: #64748b;
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.vehicle-status {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.vehicle-status svg {
+  font-size: 6px;
+  margin-right: 5px;
+}
+
+.vehicle-status.available {
+  color: #059669;
+}
+
+.vehicle-status.maintenance {
+  color: #dc2626;
+}
+
+/* TRIPS */
+
+.trip-count {
+  color: #64748b !important;
+  letter-spacing: 0 !important;
+  font-weight: 400 !important;
+}
+
+.operator-trip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 0;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.operator-trip:last-child {
+  border-bottom: 0;
+}
+
+.trip-route-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: #edf3ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trip-details {
+  flex: 1;
+}
+
+.trip-details strong {
+  display: block;
+  font-size: 12px;
+  color: #0f172a;
+}
+
+.trip-details span {
+  display: block;
+  font-size: 12px;
+  color: #334155;
+  margin-top: 3px;
+}
+
+.trip-details small {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.trip-status {
+  color: #2563eb;
+  background: #edf3ff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .operator-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .operator-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .operator-vehicle-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .operator-sidebar {
+    width: 200px;
+  }
+
+  .operator-main {
+    padding: 18px;
+  }
+
+  .operator-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .operator-kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Final operator polish */
+
+.operator-dashboard {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.operator-header h2 {
+  font-size: 26px;
+  letter-spacing: -0.5px;
+}
+
+.operator-header p {
+  font-size: 13px;
+}
+
+.operator-kpi {
+  transition: 0.18s ease;
+}
+
+.operator-kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.operator-kpi strong {
+  font-size: 24px;
+}
+
+.operator-panel {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.panel-heading h3 {
+  font-size: 17px;
+  letter-spacing: -0.2px;
+}
+
+.operator-vehicle strong,
+.trip-details strong {
+  font-size: 13px;
+}
+
+.operator-vehicle span,
+.trip-details span {
+  font-size: 11px;
+}
+
+.vehicle-status,
+.trip-status {
+  font-size: 10px;
+  font-weight: 700;
+}

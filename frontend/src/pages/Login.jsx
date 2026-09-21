@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const selectedRole = searchParams.get("role") || "manager";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,6 +23,13 @@ function Login() {
       });
 
       localStorage.setItem("token", res.data.access_token);
+
+      const uiRole =
+        selectedRole === "operator"
+          ? "OPERATOR"
+          : "FLEET_MANAGER";
+
+      localStorage.setItem("role", uiRole);
 
       navigate("/dashboard");
     } catch {

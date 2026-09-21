@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import Landing from "./pages/Landing";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -11,7 +12,7 @@ function App() {
 
       <Route
         path="/"
-        element={<Navigate to="/login" />}
+        element={<Landing />}
       />
 
       <Route
