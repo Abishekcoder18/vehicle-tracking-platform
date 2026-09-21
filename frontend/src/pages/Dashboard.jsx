@@ -388,13 +388,13 @@ function Dashboard() {
   const renderSidebar = () => (
     <aside className={`sidebar ${mobileMenu ? "mobile-open" : ""}`}>
       <div className="brand">
-        <div className="brand-mark">
+        <div className="brand-icon">
           <FaTruck />
         </div>
 
         <div>
-          <strong>FleetCommand</strong>
-          <span>Operations Platform</span>
+          <h1>FleetCommand</h1>
+          <span>Fleet Operations</span>
         </div>
       </div>
 
@@ -771,7 +771,7 @@ function Dashboard() {
 
             <div className="input-group">
               <label>Vehicle Type</label>
-              <input
+              <select
                 value={vehicleForm.vehicle_type}
                 onChange={(e) =>
                   setVehicleForm({
@@ -779,9 +779,13 @@ function Dashboard() {
                     vehicle_type: e.target.value,
                   })
                 }
-                placeholder="Truck / Van / LCV"
                 required
-              />
+              >
+                <option value="">Select vehicle type</option>
+                <option value="Car">Car</option>
+                <option value="Truck">Truck</option>
+                <option value="Sedan">Sedan</option>
+              </select>
             </div>
 
             <div className="input-group">

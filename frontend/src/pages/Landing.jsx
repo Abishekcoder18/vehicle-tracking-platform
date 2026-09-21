@@ -10,7 +10,9 @@ function Landing() {
       <div className="landing-container">
 
         <div className="landing-brand">
-          <div className="landing-logo">🚚</div>
+          <div className="landing-logo">
+            <FaTruck />
+          </div>
 
           <div>
             <h1>FleetCommand</h1>

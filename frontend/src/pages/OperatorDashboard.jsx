@@ -14,259 +14,209 @@ import "./OperatorDashboard.css";
 
 function OperatorDashboard() {
   const [dashboard, setDashboard] = useState(null);
+  const [vehicles, setVehicles] = useState([]);
+  const [trips, setTrips] = useState([]);
+  const [drivers, setDrivers] = useState([]);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [activeSection, setActiveSection] = useState("operations");
 
-  const operatorVehicles = [
-    {
-      id: 1,
-      registration: "TN45TR8343",
-      status: "Maintenance",
-      location: "Trichy Depot",
-    },
-    {
-      id: 2,
-      registration: "TN457890",
-      status: "Available",
-      location: "Trichy",
-    },
-    {
-      id: 3,
-      registration: "TN45AB1234",
-      status: "Available",
-      location: "Trichy",
-    },
-  ];
-
-  const activeTrips = [
-    {
-      id: "TRP-0021",
-      route: "Trichy → Madurai",
-      vehicle: "TN45AB1234",
-      driver: "Arun Kumar",
-      status: "Ready",
-    },
-    {
-      id: "TRP-0022",
-      route: "Trichy → Chennai",
-      vehicle: "TN457890",
-      driver: "Arun Kumar",
-      status: "Ready",
-    },
-  ];
-
-  const loadDashboard = async () => {
+  const loadData = async () => {
     try {
-      const response = await api.get("/dashboard/");
-      setDashboard(response.data);
+      const dashboardRes = await api.get("/dashboard/");
+      setDashboard(dashboardRes.data);
+
+      const activeTripsFromDashboard =
+        dashboardRes.data.active_trips || [];
+
+      setTrips(activeTripsFromDashboard);
+
+      setVehicles(
+        activeTripsFromDashboard.map((trip) => ({
+          id: trip.vehicle_id,
+          registration_number:
+            trip.vehicle_number ||
+            `Vehicle #${trip.vehicle_id}`,
+        }))
+      );
+
+      setDrivers(
+        activeTripsFromDashboard.map((trip) => ({
+          id: trip.driver_id,
+          name:
+            trip.driver_name ||
+            `Driver #${trip.driver_id}`,
+        }))
+      );
+
       setLastUpdate(new Date());
+
     } catch (error) {
-      console.error("Dashboard error:", error);
+      console.error(
+        "Operator dashboard error:",
+        error
+      );
     }
   };
 
   useEffect(() => {
-    loadDashboard();
+    loadData();
+
+    const interval = setInterval(loadData, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const refresh = () => {
-    loadDashboard();
+    loadData();
   };
 
-  return (
-    <div className="operator-dashboard">
+  const activeTrips = trips.filter(
+    (trip) => trip.status === "Active"
+  );
 
-      {/* SIDEBAR */}
-      <aside className="operator-sidebar">
+  const maintenanceVehicles =
+    dashboard?.maintenance_vehicles ?? 0;
 
-        <div className="operator-brand">
-          <div className="operator-brand-icon">🚚</div>
+  const renderOperations = () => (
+    <>
+      {/* KPI CARDS */}
+      <section className="operator-kpis">
 
-          <div>
-            <h1>FleetCommand</h1>
-            <span>Operations Platform</span>
-          </div>
-        </div>
-
-        <div className="operator-role">
-          <small>LOGGED IN AS</small>
-          <strong>Logistics Operator</strong>
-        </div>
-
-        <div className="operator-nav-title">
-          OPERATIONS
-        </div>
-
-        <nav>
-          <div className="operator-nav active">
-            <FaRoute />
-            Operations
-          </div>
-
-          <div className="operator-nav">
-            <FaMapMarkerAlt />
-            Live Map
-          </div>
-
-          <div className="operator-nav">
+        <div className="operator-kpi">
+          <div className="kpi-icon blue">
             <FaTruck />
-            Vehicles
           </div>
-
-          <div className="operator-nav">
-            <FaRoute />
-            Active Trips
-          </div>
-
-          <div className="operator-nav">
-            <FaBell />
-            Alerts
-          </div>
-        </nav>
-
-        <div className="operator-sidebar-bottom">
-          <button
-            onClick={() => {
-              localStorage.clear();
-              window.location.href = "/";
-            }}
-          >
-            Sign out
-          </button>
-        </div>
-
-      </aside>
-
-      {/* MAIN */}
-      <main className="operator-main">
-
-        <header className="operator-header">
 
           <div>
-            <span>FLEET OPERATIONS / TRACKING</span>
-            <h2>Live Operations</h2>
-            <p>
-              Monitor vehicles and active fleet movements.
-            </p>
+            <span>Fleet Vehicles</span>
+            <strong>
+              {dashboard?.total_vehicles ?? 0}
+            </strong>
+            <small>Fleet visibility</small>
+          </div>
+        </div>
+
+        <div className="operator-kpi">
+          <div className="kpi-icon green">
+            <FaCircle />
           </div>
 
-          <div className="operator-header-right">
-            <div className="live-status">
-              <FaCircle />
-              LIVE
-            </div>
+          <div>
+            <span>Available</span>
+            <strong>
+              {dashboard?.available_vehicles ?? 0}
+            </strong>
+            <small>Ready for assignment</small>
+          </div>
+        </div>
 
-            <small>
-              Last update {lastUpdate.toLocaleTimeString()}
-            </small>
-
-            <button onClick={refresh} className="refresh-btn">
-              <FaSyncAlt />
-            </button>
+        <div className="operator-kpi">
+          <div className="kpi-icon orange">
+            <FaRoute />
           </div>
 
-        </header>
+          <div>
+            <span>Active Trips</span>
+            <strong>{activeTrips.length}</strong>
+            <small>Currently operating</small>
+          </div>
+        </div>
 
-        {/* KPI CARDS */}
+        <div className="operator-kpi">
+          <div className="kpi-icon red">
+            <FaBell />
+          </div>
 
-        <section className="operator-kpis">
+          <div>
+            <span>Alerts</span>
+            <strong>{maintenanceVehicles}</strong>
+            <small>Need attention</small>
+          </div>
+        </div>
 
-          <div className="operator-kpi">
-            <div className="kpi-icon blue">
-              <FaTruck />
-            </div>
+      </section>
 
+      {/* OPERATIONS SUMMARY */}
+      <section className="operator-grid">
+
+        {/* ACTIVE TRIPS */}
+        <div className="operator-panel">
+
+          <div className="panel-heading">
             <div>
-              <span>Tracked Vehicles</span>
-              <strong>
-                {dashboard?.total_vehicles ?? 3}
-              </strong>
-              <small>Fleet visibility</small>
+              <span>ROUTE MONITORING</span>
+              <h3>Active Trips</h3>
             </div>
+
+            <span className="trip-count">
+              {activeTrips.length} active
+            </span>
           </div>
 
-          <div className="operator-kpi">
-            <div className="kpi-icon green">
-              <FaCircle />
-            </div>
-
-            <div>
-              <span>Available</span>
-              <strong>
-                {dashboard?.available_vehicles ?? 2}
-              </strong>
-              <small>Ready for assignment</small>
-            </div>
-          </div>
-
-          <div className="operator-kpi">
-            <div className="kpi-icon orange">
+          {activeTrips.length === 0 ? (
+            <div className="empty-state">
               <FaRoute />
-            </div>
 
-            <div>
-              <span>Active Trips</span>
               <strong>
-                {dashboard?.running_trips ?? 0}
+                No active trips
               </strong>
-              <small>Currently operating</small>
-            </div>
-          </div>
 
-          <div className="operator-kpi">
-            <div className="kpi-icon red">
-              <FaBell />
-            </div>
-
-            <div>
-              <span>Alerts</span>
-              <strong>
-                {dashboard?.maintenance_vehicles ?? 0}
-              </strong>
-              <small>Need attention</small>
-            </div>
-          </div>
-
-        </section>
-
-        {/* MAP + ALERTS */}
-
-        <section className="operator-grid">
-
-          <div className="operator-panel map-panel">
-
-            <div className="panel-heading">
-              <div>
-                <span>LIVE TRACKING</span>
-                <h3>Fleet Map</h3>
-              </div>
-
-              <span className="map-live">
-                <FaCircle /> Live
+              <span>
+                Active assignments will appear here.
               </span>
             </div>
+          ) : (
+            <div className="operator-trips">
+              {activeTrips.map((trip) => (
+                <div
+                  className="operator-trip"
+                  key={trip.id}
+                >
+                  <div className="trip-route-icon">
+                    <FaRoute />
+                  </div>
 
-            <div className="operator-map">
-              <GoogleMap
-                trips={[]}
-                vehicles={[]}
-              />
+                  <div className="trip-details">
+                    <strong>
+                      TRP-{String(trip.id).padStart(4, "0")}
+                    </strong>
+
+                    <span>
+                      {trip.source} → {trip.destination}
+                    </span>
+
+                    <small>
+                      Vehicle #{trip.vehicle_id}
+                      {" • "}
+                      Driver #{trip.driver_id}
+                    </small>
+                  </div>
+
+                  <div className="trip-status">
+                    ACTIVE
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+        </div>
+
+        {/* ALERT SUMMARY */}
+        <div className="operator-panel">
+
+          <div className="panel-heading">
+            <div>
+              <span>ATTENTION</span>
+              <h3>Operational Alerts</h3>
             </div>
 
+            <div className="alert-count">
+              {maintenanceVehicles}
+            </div>
           </div>
 
-          <div className="operator-panel">
-
-            <div className="panel-heading">
-              <div>
-                <span>ATTENTION</span>
-                <h3>Operational Alerts</h3>
-              </div>
-
-              <div className="alert-count">
-                {dashboard?.maintenance_vehicles ?? 0}
-              </div>
-            </div>
-
+          {maintenanceVehicles > 0 ? (
             <div className="operator-alert">
 
               <div className="alert-icon">
@@ -279,84 +229,196 @@ function OperatorDashboard() {
                 </strong>
 
                 <p>
-                  TN45TR8343 is currently unavailable.
+                  Vehicles currently unavailable.
                 </p>
               </div>
 
             </div>
+          ) : (
+            <div className="operator-alert">
 
-          </div>
-
-        </section>
-
-        {/* VEHICLES */}
-
-        <section className="operator-panel">
-
-          <div className="panel-heading">
-            <div>
-              <span>VEHICLE STATUS</span>
-              <h3>Fleet Visibility</h3>
-            </div>
-          </div>
-
-          <div className="operator-vehicle-list">
-
-            {operatorVehicles.map((vehicle) => (
-
-              <div
-                className="operator-vehicle"
-                key={vehicle.id}
-              >
-
-                <div className="vehicle-main-icon">
-                  <FaTruck />
-                </div>
-
-                <div className="vehicle-info">
-                  <strong>{vehicle.registration}</strong>
-                  <span>
-                    <FaMapMarkerAlt />
-                    {vehicle.location}
-                  </span>
-                </div>
-
-                <div
-                  className={`vehicle-status ${vehicle.status
-                    .toLowerCase()
-                    .replace(" ", "-")}`}
-                >
-                  <FaCircle />
-                  {vehicle.status}
-                </div>
-
+              <div className="alert-icon">
+                <FaCircle />
               </div>
 
-            ))}
+              <div>
+                <strong>
+                  No active alerts
+                </strong>
 
-          </div>
+                <p>
+                  Fleet operations are running normally.
+                </p>
+              </div>
 
-        </section>
+            </div>
+          )}
 
-        {/* ACTIVE TRIPS */}
+        </div>
 
-        <section className="operator-panel">
+      </section>
+    </>
+  );
 
-          <div className="panel-heading">
-            <div>
-              <span>ROUTE MONITORING</span>
-              <h3>Current Trips</h3>
+  const renderLiveMap = () => (
+    <section className="operator-panel">
+
+      <div className="panel-heading">
+
+        <div>
+          <span>LIVE TRACKING</span>
+          <h3>Fleet Map</h3>
+        </div>
+
+        <span className="map-live">
+          <FaCircle /> Live
+        </span>
+
+      </div>
+
+      <GoogleMap
+        trips={activeTrips}
+        vehicles={vehicles}
+      />
+
+    </section>
+  );
+
+  const renderVehicles = () => (
+    <section className="operator-panel">
+
+      <div className="panel-heading">
+        <div>
+          <span>FLEET VISIBILITY</span>
+          <h3>Vehicles</h3>
+        </div>
+
+        <span className="trip-count">
+          {dashboard?.total_vehicles ?? 0} vehicles
+        </span>
+      </div>
+
+      <div className="operator-trips">
+
+        {dashboard?.total_vehicles ? (
+          <>
+            <div className="operator-trip">
+
+              <div className="trip-route-icon">
+                <FaTruck />
+              </div>
+
+              <div className="trip-details">
+                <strong>
+                  Fleet Overview
+                </strong>
+
+                <span>
+                  {dashboard.total_vehicles} vehicles registered
+                </span>
+
+                <small>
+                  {dashboard.available_vehicles ?? 0} available
+                  {" • "}
+                  {dashboard.maintenance_vehicles ?? 0} maintenance
+                </small>
+              </div>
+
+              <div className="trip-status">
+                MONITORING
+              </div>
+
             </div>
 
-            <span className="trip-count">
-              {activeTrips.length} routes
+            <div className="operator-trip">
+
+              <div className="trip-route-icon">
+                <FaRoute />
+              </div>
+
+              <div className="trip-details">
+                <strong>
+                  Active Fleet
+                </strong>
+
+                <span>
+                  Vehicles currently assigned to trips
+                </span>
+
+                <small>
+                  {activeTrips.length} active trip
+                  {activeTrips.length === 1 ? "" : "s"}
+                </small>
+              </div>
+
+              <div className="trip-status">
+                LIVE
+              </div>
+
+            </div>
+          </>
+        ) : (
+          <div className="empty-state">
+            <FaTruck />
+            <strong>No vehicle data</strong>
+            <span>
+              Fleet information is currently unavailable.
+            </span>
+          </div>
+        )}
+
+      </div>
+
+    </section>
+  );
+
+  const renderActiveTrips = () => (
+    <section className="operator-panel">
+
+      <div className="panel-heading">
+
+        <div>
+          <span>ROUTE MONITORING</span>
+          <h3>Active Trips</h3>
+        </div>
+
+        <span className="trip-count">
+          {activeTrips.length} active
+        </span>
+
+      </div>
+
+      <div className="operator-trips">
+
+        {activeTrips.length === 0 ? (
+
+          <div className="empty-state">
+            <FaRoute />
+
+            <strong>
+              No active trips
+            </strong>
+
+            <span>
+              Active assignments will appear here.
             </span>
           </div>
 
-          <div className="operator-trips">
+        ) : (
 
-            {activeTrips.map((trip) => (
+          activeTrips.map((trip) => {
 
+            const vehicle = vehicles.find(
+              (item) =>
+                item.id === trip.vehicle_id
+            );
+
+            const driver = drivers.find(
+              (item) =>
+                item.id === trip.driver_id
+            );
+
+            return (
               <div
                 className="operator-trip"
                 key={trip.id}
@@ -368,29 +430,320 @@ function OperatorDashboard() {
 
                 <div className="trip-details">
 
-                  <strong>{trip.id}</strong>
+                  <strong>
+                    TRP-{String(trip.id).padStart(4, "0")}
+                  </strong>
 
                   <span>
-                    {trip.route}
+                    {trip.source} → {trip.destination}
                   </span>
 
                   <small>
-                    {trip.vehicle} • {trip.driver}
+                    {vehicle?.registration_number ||
+                      `Vehicle #${trip.vehicle_id}`}
+                    {" • "}
+                    {driver?.name ||
+                      `Driver #${trip.driver_id}`}
                   </small>
 
                 </div>
 
                 <div className="trip-status">
-                  {trip.status}
+                  ACTIVE
                 </div>
 
               </div>
+            );
+          })
 
-            ))}
+        )}
+
+      </div>
+
+    </section>
+  );
+
+  const renderAlerts = () => (
+    <section className="operator-panel">
+
+      <div className="panel-heading">
+
+        <div>
+          <span>ATTENTION</span>
+          <h3>Operational Alerts</h3>
+        </div>
+
+        <div className="alert-count">
+          {maintenanceVehicles}
+        </div>
+
+      </div>
+
+      {maintenanceVehicles > 0 ? (
+
+        <div className="operator-alert">
+
+          <div className="alert-icon">
+            <FaBell />
+          </div>
+
+          <div>
+            <strong>
+              Vehicle maintenance required
+            </strong>
+
+            <p>
+              {maintenanceVehicles} vehicle
+              {maintenanceVehicles === 1 ? "" : "s"} currently
+              unavailable for operations.
+            </p>
+          </div>
+
+        </div>
+
+      ) : (
+
+        <div className="operator-alert">
+
+          <div className="alert-icon">
+            <FaCircle />
+          </div>
+
+          <div>
+            <strong>
+              No active alerts
+            </strong>
+
+            <p>
+              Fleet operations are running normally.
+            </p>
+          </div>
+
+        </div>
+
+      )}
+
+    </section>
+  );
+
+  const sectionTitles = {
+    operations: {
+      title: "Live Operations",
+      description:
+        "Monitor vehicles and active fleet movements.",
+    },
+
+    map: {
+      title: "Live Map",
+      description:
+        "Track active vehicles and their current movements.",
+    },
+
+    vehicles: {
+      title: "Vehicles",
+      description:
+        "Monitor fleet availability and operational status.",
+    },
+
+    trips: {
+      title: "Active Trips",
+      description:
+        "Monitor currently active fleet assignments.",
+    },
+
+    alerts: {
+      title: "Alerts",
+      description:
+        "Review operational issues requiring attention.",
+    },
+  };
+
+  const currentPage = sectionTitles[activeSection];
+
+  return (
+    <div className="operator-dashboard">
+
+      {/* SIDEBAR */}
+
+      <aside className="operator-sidebar">
+
+        <div className="operator-brand">
+
+          <div className="operator-brand-icon">
+            <FaTruck />
+          </div>
+
+          <div>
+            <h1>FleetCommand</h1>
+            <span>Fleet Operations</span>
+          </div>
+
+        </div>
+
+        <div className="operator-role">
+
+          <small>LOGGED IN AS</small>
+
+          <strong>
+            Logistics Operator
+          </strong>
+
+        </div>
+
+        <div className="operator-nav-title">
+          OPERATIONS
+        </div>
+
+        <nav>
+
+          <div
+            className={`operator-nav ${
+              activeSection === "operations"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActiveSection("operations")
+            }
+          >
+            <FaRoute />
+            Operations
+          </div>
+
+          <div
+            className={`operator-nav ${
+              activeSection === "map"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActiveSection("map")
+            }
+          >
+            <FaMapMarkerAlt />
+            Live Map
+          </div>
+
+          <div
+            className={`operator-nav ${
+              activeSection === "vehicles"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActiveSection("vehicles")
+            }
+          >
+            <FaTruck />
+            Vehicles
+          </div>
+
+          <div
+            className={`operator-nav ${
+              activeSection === "trips"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActiveSection("trips")
+            }
+          >
+            <FaRoute />
+            Active Trips
+          </div>
+
+          <div
+            className={`operator-nav ${
+              activeSection === "alerts"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActiveSection("alerts")
+            }
+          >
+            <FaBell />
+            Alerts
+          </div>
+
+        </nav>
+
+        <div className="operator-sidebar-bottom">
+
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/";
+            }}
+          >
+            Sign out
+          </button>
+
+        </div>
+
+      </aside>
+
+      {/* MAIN */}
+
+      <main className="operator-main">
+
+        <header className="operator-header">
+
+          <div>
+
+            <span>
+              FLEET OPERATIONS / TRACKING
+            </span>
+
+            <h2>
+              {currentPage.title}
+            </h2>
+
+            <p>
+              {currentPage.description}
+            </p>
 
           </div>
 
-        </section>
+          <div className="operator-header-right">
+
+            <div className="live-status">
+              <FaCircle />
+              LIVE
+            </div>
+
+            <small>
+              Last update{" "}
+              {lastUpdate.toLocaleTimeString()}
+            </small>
+
+            <button
+              onClick={refresh}
+              className="refresh-btn"
+            >
+              <FaSyncAlt />
+            </button>
+
+          </div>
+
+        </header>
+
+        {/* ONLY ONE SECTION IS RENDERED */}
+
+        {activeSection === "operations" &&
+          renderOperations()}
+
+        {activeSection === "map" &&
+          renderLiveMap()}
+
+        {activeSection === "vehicles" &&
+          renderVehicles()}
+
+        {activeSection === "trips" &&
+          renderActiveTrips()}
+
+        {activeSection === "alerts" &&
+          renderAlerts()}
 
       </main>
 

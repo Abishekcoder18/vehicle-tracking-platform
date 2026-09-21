@@ -3,462 +3,174 @@ import {
   Map,
   AdvancedMarker,
   useMap,
-  useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { FaTruck } from "react-icons/fa";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import api from "../services/api";
 
 
 // =====================================================
-// ROUTE DISPLAY (Only draws the route line and calculates progress)
+// FIXED DEMO ROUTE
+// TRICHY → CHENNAI
 // =====================================================
 
-function RouteDisplay({
-  trip,
-  vehicleId,
-  vehicleLocation,
-  onProgressChange,
-  simulationRunning,
-  onSimulationComplete,
-}) {
-  const map = useMap();
-  const routesLibrary = useMapsLibrary("routes");
-
-  const [route, setRoute] = useState(null);
-
-  // Prevent the same route from being calculated repeatedly
-  const calculatedRouteRef = useRef("");
-
-  // Prevent duplicate progress updates
-  const lastProgressRef = useRef(-1);
+const TRICHY_TO_CHENNAI = [
+  { lat: 10.7905, lng: 78.7047 }, // Trichy
+  { lat: 10.9500, lng: 78.7600 },
+  { lat: 11.2342, lng: 78.8803 }, // Perambalur
+  { lat: 11.4500, lng: 78.7500 },
+  { lat: 11.6643, lng: 78.1460 }, // Salem
+  { lat: 11.9500, lng: 78.5500 },
+  { lat: 12.2500, lng: 78.8000 },
+  { lat: 12.5500, lng: 79.0500 },
+  { lat: 12.9165, lng: 79.1325 }, // Vellore
+  { lat: 12.8342, lng: 79.7036 }, // Kanchipuram
+  { lat: 12.6819, lng: 79.8711 }, // Chengalpattu
+  { lat: 12.8500, lng: 80.0500 },
+  { lat: 13.0827, lng: 80.2707 }, // Chennai
+];
 
 
-  // ===================================================
-  // ROUTE CALCULATION
-  // ===================================================
+// =====================================================
+// CREATE A SMOOTH PATH BETWEEN THE ROUTE POINTS
+// =====================================================
 
-  useEffect(() => {
-    if (!map || !routesLibrary) {
-      return;
-    }
+function createSmoothPath(points, pointsPerSegment = 8) {
+  const result = [];
 
-    if (!trip?.source || !trip?.destination) {
-      return;
-    }
+  for (let i = 0; i < points.length - 1; i++) {
+    const start = points[i];
+    const end = points[i + 1];
 
-    const routeKey = `${trip.source}|${trip.destination}`;
+    for (let j = 0; j < pointsPerSegment; j++) {
+      const t = j / pointsPerSegment;
 
-    // IMPORTANT:
-    // Do not calculate the same route repeatedly
-    if (calculatedRouteRef.current === routeKey) {
-      return;
-    }
+      result.push({
+        lat:
+          start.lat +
+          (end.lat - start.lat) * t,
 
-    calculatedRouteRef.current = routeKey;
-
-    let cancelled = false;
-
-    const calculateRoute = async () => {
-      try {
-        const { Route } = routesLibrary;
-
-        const request = {
-          origin: trip.source,
-          destination: trip.destination,
-          travelMode: "DRIVING",
-          fields: ["path"],
-        };
-
-        const result = await Route.computeRoutes(request);
-
-        if (cancelled) {
-          return;
-        }
-
-        if (!result.routes || result.routes.length === 0) {
-          console.error("No route found");
-          calculatedRouteRef.current = "";
-          return;
-        }
-
-        setRoute(result.routes[0]);
-
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Route calculation failed:", error);
-          calculatedRouteRef.current = "";
-        }
-      }
-    };
-
-    calculateRoute();
-
-    return () => {
-      cancelled = true;
-    };
-
-  }, [
-    map,
-    routesLibrary,
-    trip?.source,
-    trip?.destination,
-  ]);
-
-  // ===================================================
-  // DRAW ROUTE (Only the polyline, no vehicle marker)
-  // ===================================================
-
-  useEffect(() => {
-    if (!route || !map) {
-      return;
-    }
-
-    const polylines = route.createPolylines();
-
-    polylines.forEach((polyline) => {
-      polyline.setMap(map);
-    });
-
-    // Fit map to route
-    if (route.path?.length) {
-
-      const bounds = new google.maps.LatLngBounds();
-
-      route.path.forEach((point) => {
-        bounds.extend(point);
+        lng:
+          start.lng +
+          (end.lng - start.lng) * t,
       });
-
-      map.fitBounds(bounds);
     }
-
-    // Cleanup
-    return () => {
-
-      polylines.forEach((polyline) => {
-        polyline.setMap(null);
-      });
-
-    };
-
-  }, [route, map]);
-
-
-  // ===================================================
-  // GPS SIMULATOR
-  // Sends the vehicle along the actual Google route
-  // ===================================================
-
-  const simulatorRunningRef = useRef(false);
-
-  useEffect(() => {
-    if (
-      !route?.path?.length ||
-      !vehicleId ||
-      !trip?.id ||
-      !simulationRunning
-    ) {
-      return;
-    }
-
-    // Prevent duplicate simulator instances
-    if (simulatorRunningRef.current) {
-      console.log("GPS Simulator already running");
-      return;
-    }
-
-    simulatorRunningRef.current = true;
-
-    let currentIndex = 0;
-
-    // Start from the current GPS position if available
-    if (vehicleLocation && route.path?.length) {
-      let closestIndex = 0;
-      let closestDistance = Infinity;
-
-      route.path.forEach((point, index) => {
-        const lat =
-          typeof point.lat === "function"
-            ? point.lat()
-            : point.lat;
-
-        const lng =
-          typeof point.lng === "function"
-            ? point.lng()
-            : point.lng;
-
-        const distance =
-          Math.pow(lat - vehicleLocation.latitude, 2) +
-          Math.pow(lng - vehicleLocation.longitude, 2);
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = index;
-        }
-      });
-
-      currentIndex = closestIndex;
-
-      console.log(
-        "GPS Simulator starting from route index:",
-        currentIndex
-      );
-    }
-
-    let stopped = false;
-
-    const lastIndex = route.path.length - 1;
-
-    // Around 40 GPS points for the complete trip
-    const step = Math.max(
-      1,
-      Math.floor(route.path.length / 40)
-    );
-
-    const sendGpsLocation = async () => {
-      if (stopped) {
-        return;
-      }
-
-      const point = route.path[currentIndex];
-
-      if (!point) {
-        return;
-      }
-
-      const latitude =
-        typeof point.lat === "function"
-          ? point.lat()
-          : point.lat;
-
-      const longitude =
-        typeof point.lng === "function"
-          ? point.lng()
-          : point.lng;
-
-      try {
-        await api.post("/vehicle-locations/", {
-          vehicle_id: vehicleId,
-          trip_id: trip.id,
-          latitude,
-          longitude,
-        });
-
-        console.log(
-          "GPS Simulator:",
-          latitude,
-          longitude
-        );
-
-      } catch (error) {
-
-        if (!stopped) {
-          console.error(
-            "GPS Simulator failed:",
-            error
-          );
-        }
-
-        return;
-      }
-
-      // Check if destination reached
-      if (currentIndex >= lastIndex) {
-
-        console.log(
-          "GPS Simulator reached destination"
-        );
-
-        stopped = true;
-        simulatorRunningRef.current = false;
-
-        if (simulatorInterval) {
-          clearInterval(simulatorInterval);
-        }
-
-        // Set progress to 100% and notify completion
-        onProgressChange(100);
-        onSimulationComplete();
-
-        return;
-      }
-
-      currentIndex = Math.min(
-        currentIndex + step,
-        lastIndex
-      );
-    };
-
-    let simulatorInterval = null;
-
-    // Send starting location immediately
-    sendGpsLocation();
-
-    // Continue every 5 seconds (slower for better demonstration)
-    simulatorInterval = setInterval(() => {
-
-      if (stopped) {
-        clearInterval(simulatorInterval);
-        return;
-      }
-
-      sendGpsLocation();
-
-    }, 5000);
-
-    return () => {
-
-      stopped = true;
-
-      if (simulatorInterval) {
-        clearInterval(simulatorInterval);
-      }
-
-      simulatorRunningRef.current = false;
-
-      console.log(
-        "GPS Simulator stopped"
-      );
-    };
-
-  }, [
-    route,
-    vehicleId,
-    trip?.id,
-    simulationRunning,
-  ]);
-
-
-  // ===================================================
-  // UPDATE PROGRESS BASED ON GPS COORDINATE
-  // ===================================================
-
-  useEffect(() => {
-    if (!route?.path?.length || !vehicleLocation) {
-      return;
-    }
-
-    const totalPoints = route.path.length - 1;
-
-    if (totalPoints <= 0) {
-      return;
-    }
-
-    const vehicleLat = vehicleLocation.latitude;
-    const vehicleLng = vehicleLocation.longitude;
-
-    let closestIndex = 0;
-    let closestDistance = Infinity;
-
-    route.path.forEach((point, index) => {
-      const lat = typeof point.lat === "function"
-        ? point.lat()
-        : point.lat;
-
-      const lng = typeof point.lng === "function"
-        ? point.lng()
-        : point.lng;
-
-      const distance =
-        Math.pow(lat - vehicleLat, 2) +
-        Math.pow(lng - vehicleLng, 2);
-
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
-
-    const calculatedProgress = Math.round(
-      (closestIndex / totalPoints) * 100
-    );
-
-    if (lastProgressRef.current === calculatedProgress) {
-      return;
-    }
-
-    lastProgressRef.current = calculatedProgress;
-
-    onProgressChange(calculatedProgress);
-
-  }, [
-    route,
-    vehicleLocation,
-    onProgressChange,
-  ]);
-
-
-  // ===================================================
-  // WAIT FOR ROUTE
-  // ===================================================
-
-  if (!route?.path?.length) {
-    return null;
   }
 
-  // This component now only draws the route line and calculates progress
+  result.push(points[points.length - 1]);
+
+  return result;
+}
+
+
+// =====================================================
+// BLUE ROUTE LINE
+// =====================================================
+
+function RouteLine() {
+  const map = useMap();
+
+  const smoothPath = useMemo(
+    () => createSmoothPath(TRICHY_TO_CHENNAI),
+    []
+  );
+
+  useEffect(() => {
+    if (!map || !window.google) {
+      return;
+    }
+
+    const polyline =
+      new window.google.maps.Polyline({
+        path: smoothPath,
+        geodesic: true,
+        strokeColor: "#2563eb",
+        strokeOpacity: 0.95,
+        strokeWeight: 5,
+      });
+
+    polyline.setMap(map);
+
+    // Fit the entire Trichy → Chennai route
+    const bounds =
+      new window.google.maps.LatLngBounds();
+
+    smoothPath.forEach((point) => {
+      bounds.extend(point);
+    });
+
+    map.fitBounds(bounds, 50);
+
+    return () => {
+      polyline.setMap(null);
+    };
+  }, [map, smoothPath]);
+
   return null;
 }
 
 
 // =====================================================
-// VEHICLE LOCATION MARKER
+// VEHICLE MARKER
 // =====================================================
 
-function VehicleLocationMarker({ location, vehicleNumber }) {
-  const [showVehicleNumber, setShowVehicleNumber] = useState(false);
+function VehicleMarker({
+  location,
+  vehicleNumber,
+}) {
+  const [showNumber, setShowNumber] =
+    useState(false);
 
-  if (!location) return null;
+  if (!location) {
+    return null;
+  }
 
   return (
     <AdvancedMarker
-      key={`${location.latitude}-${location.longitude}`}
       position={{
         lat: Number(location.latitude),
         lng: Number(location.longitude),
       }}
     >
       <div
-        onClick={() => setShowVehicleNumber(!showVehicleNumber)}
+        onClick={() =>
+          setShowNumber((value) => !value)
+        }
         style={{
           position: "relative",
           cursor: "pointer",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          pointerEvents: "auto",
         }}
       >
-        {/* Vehicle Number Tooltip */}
-        {showVehicleNumber && (
+        {showNumber && (
           <div
             style={{
               position: "absolute",
-              bottom: "42px",
-              left: "50%",
-              transform: "translateX(-50%)",
+              bottom: "45px",
               background: "#111827",
-              color: "white",
+              color: "#ffffff",
               padding: "6px 10px",
               borderRadius: "6px",
               fontSize: "12px",
               fontWeight: "600",
               whiteSpace: "nowrap",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
-              zIndex: 10,
+              boxShadow:
+                "0 2px 8px rgba(0,0,0,.25)",
+              zIndex: 20,
             }}
           >
             {vehicleNumber}
           </div>
         )}
 
-        {/* Truck Icon with pulse effect */}
         <div
           style={{
-            fontSize: "36px",
-            lineHeight: "1",
-            userSelect: "none",
-            animation: "pulse 2s infinite",
+            fontSize: "34px",
+            lineHeight: 1,
           }}
         >
           🚛
@@ -477,396 +189,586 @@ function GoogleMap({
   trips = [],
   vehicles = [],
 }) {
+  const [progress, setProgress] =
+    useState(0);
 
-  const [progress, setProgress] = useState(0);
-  const [vehicleLocation, setVehicleLocation] = useState(null);
-  const [loadingLocation, setLoadingLocation] = useState(false);
-  const [locationError, setLocationError] = useState(null);
-  const [simulationRunning, setSimulationRunning] = useState(false);
+  const [vehicleLocation, setVehicleLocation] =
+    useState(null);
 
+  const [simulationRunning, setSimulationRunning] =
+    useState(false);
+
+  const simulationTimerRef =
+    useRef(null);
+
+  const simulationIndexRef =
+    useRef(0);
 
   // ===================================================
-  // FIND RUNNING TRIP
+  // ACTIVE TRIP
   // ===================================================
 
   const runningTrip = trips.find(
-    (trip) =>
-      trip.status === "Running" ||
-      trip.status === "On Trip"
+    (trip) => trip.status === "Active"
   );
 
-
   // ===================================================
-  // FIND RUNNING VEHICLE
+  // ACTIVE VEHICLE
   // ===================================================
 
   const runningVehicle = vehicles.find(
     (vehicle) =>
-      vehicle.registration_number ===
-      runningTrip?.vehicle_number
+      vehicle.id === runningTrip?.vehicle_id
   );
 
-
   // ===================================================
-  // FETCH VEHICLE LOCATION
+  // RESET WHEN TRIP CHANGES
   // ===================================================
 
   useEffect(() => {
-    // Reset location when trip changes
+    setProgress(0);
     setVehicleLocation(null);
-    setLocationError(null);
+    setSimulationRunning(false);
 
-    if (!runningVehicle?.id) {
+    simulationIndexRef.current = 0;
+
+    if (simulationTimerRef.current) {
+      clearInterval(simulationTimerRef.current);
+
+      simulationTimerRef.current = null;
+    }
+  }, [runningTrip?.id]);
+
+  // ===================================================
+  // CLEANUP
+  // ===================================================
+
+  useEffect(() => {
+    return () => {
+      if (simulationTimerRef.current) {
+        clearInterval(
+          simulationTimerRef.current
+        );
+      }
+    };
+  }, []);
+
+  // ===================================================
+  // START SIMULATION
+  // ===================================================
+
+  const startSimulation = () => {
+    if (!runningTrip || !runningVehicle) {
       return;
     }
 
-    const fetchVehicleLocation = async () => {
-      setLoadingLocation(true);
-      setLocationError(null);
+    if (simulationTimerRef.current) {
+      return;
+    }
 
-      try {
-        const response = await api.get(
-          `/vehicle-locations/vehicle/${runningVehicle.id}/latest`
-        );
+    const path =
+      createSmoothPath(
+        TRICHY_TO_CHENNAI,
+        8
+      );
 
-        console.log("Latest vehicle location:", response.data);
+    let index =
+      simulationIndexRef.current;
 
-        if (response.data) {
-          setVehicleLocation(response.data);
-        } else {
-          setLocationError("No location data available");
-        }
-      } catch (error) {
-        console.error("Failed to fetch vehicle location:", error);
-        setLocationError("Failed to load vehicle location");
-      } finally {
-        setLoadingLocation(false);
-      }
-    };
+    setSimulationRunning(true);
 
-    fetchVehicleLocation();
+    // -----------------------------------------------
+    // Immediately place truck at TRICHY
+    // -----------------------------------------------
 
-    // Poll for updates every 3 seconds (faster for smoother movement)
-    const intervalId = setInterval(fetchVehicleLocation, 3000);
+    const startPoint = path[index];
 
-    return () => {
-      clearInterval(intervalId);
-    };
-
-  }, [runningVehicle?.id]);
-
-
-  // ===================================================
-  // PROGRESS CALLBACK
-  // ===================================================
-
-  const handleProgressChange = useCallback(
-    (newProgress) => {
-
-      setProgress((currentProgress) => {
-
-        // Don't update state if value hasn't changed
-
-        if (currentProgress === newProgress) {
-          return currentProgress;
-        }
-
-        return newProgress;
-      });
-
-    },
-    []
-  );
-
-
-  // ===================================================
-  // RESET PROGRESS WHEN TRIP CHANGES
-  // ===================================================
-
-  useEffect(() => {
+    setVehicleLocation({
+      latitude: startPoint.lat,
+      longitude: startPoint.lng,
+    });
 
     setProgress(0);
 
-  }, [
-    runningTrip?.id,
-  ]);
+    // -----------------------------------------------
+    // MOVE EVERY 2 SECONDS
+    // -----------------------------------------------
 
+    simulationTimerRef.current =
+      setInterval(async () => {
 
-  // ===================================================
-  // MAP + TRACKING PANEL
-  // ===================================================
+        index += 1;
 
-  return (
-    <>
+        // ---------------------------------------------
+        // DESTINATION REACHED
+        // ---------------------------------------------
 
-      {/* ==============================================
-          GOOGLE MAP
-          ============================================== */}
+        if (index >= path.length) {
+          index = path.length - 1;
 
-      <div className="google-map-container">
+          const destination =
+            path[index];
 
-        <APIProvider
-          apiKey={
-            import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+          setVehicleLocation({
+            latitude: destination.lat,
+            longitude: destination.lng,
+          });
+
+          setProgress(100);
+
+          simulationIndexRef.current =
+            index;
+
+          clearInterval(
+            simulationTimerRef.current
+          );
+
+          simulationTimerRef.current =
+            null;
+
+          setSimulationRunning(false);
+
+          // -------------------------------------------
+          // SAVE FINAL GPS LOCATION
+          // -------------------------------------------
+
+          try {
+            await api.post(
+              "/vehicle-locations/",
+              {
+                vehicle_id:
+                  runningVehicle.id,
+
+                trip_id:
+                  runningTrip.id,
+
+                latitude:
+                  destination.lat,
+
+                longitude:
+                  destination.lng,
+              }
+            );
+          } catch (error) {
+            console.error(
+              "Final GPS update failed:",
+              error
+            );
           }
+
+          // -------------------------------------------
+          // COMPLETE TRIP IN BACKEND
+          // -------------------------------------------
+
+          try {
+            await api.put(
+              `/trips/${runningTrip.id}`,
+              {
+                status: "Completed",
+              }
+            );
+
+            console.log(
+              "Trip completed successfully"
+            );
+          } catch (error) {
+            console.error(
+              "Failed to complete trip:",
+              error
+            );
+          }
+
+          return;
+        }
+
+        // ---------------------------------------------
+        // CURRENT POSITION
+        // ---------------------------------------------
+
+        const point = path[index];
+
+        const location = {
+          latitude: point.lat,
+          longitude: point.lng,
+        };
+
+        // ---------------------------------------------
+        // UPDATE UI POSITION
+        // ---------------------------------------------
+
+        setVehicleLocation(location);
+
+        // ---------------------------------------------
+        // UPDATE PROGRESS
+        // ---------------------------------------------
+
+        const newProgress =
+          Math.round(
+            (index /
+              (path.length - 1)) *
+              100
+          );
+
+        setProgress(newProgress);
+
+        simulationIndexRef.current =
+          index;
+
+        // ---------------------------------------------
+        // SAVE GPS TO BACKEND
+        // ---------------------------------------------
+
+        try {
+          await api.post(
+            "/vehicle-locations/",
+            {
+              vehicle_id:
+                runningVehicle.id,
+
+              trip_id:
+                runningTrip.id,
+
+              latitude:
+                point.lat,
+
+              longitude:
+                point.lng,
+            }
+          );
+
+          console.log(
+            "GPS:",
+            point.lat,
+            point.lng,
+            `${newProgress}%`
+          );
+        } catch (error) {
+          console.error(
+            "GPS update failed:",
+            error
+          );
+        }
+
+      }, 2000);
+  };
+
+  // ===================================================
+  // STOP SIMULATION
+  // ===================================================
+
+  const stopSimulation = () => {
+    if (simulationTimerRef.current) {
+      clearInterval(
+        simulationTimerRef.current
+      );
+
+      simulationTimerRef.current =
+        null;
+    }
+
+    setSimulationRunning(false);
+  };
+
+  // ===================================================
+  // MAP CENTER
+  // ===================================================
+
+  const mapCenter = vehicleLocation
+    ? {
+        lat:
+          Number(
+            vehicleLocation.latitude
+          ),
+
+        lng:
+          Number(
+            vehicleLocation.longitude
+          ),
+      }
+    : {
+        lat: 10.7905,
+        lng: 78.7047,
+      };
+
+  // ===================================================
+  // NO ACTIVE TRIP
+  // ===================================================
+
+  if (!runningTrip) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "420px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#f8fafc",
+          borderRadius: "12px",
+          border: "1px solid #e2e8f0",
+        }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            color: "#64748b",
+          }}
         >
-
-          <Map
-            defaultCenter={{
-              lat: 20.5937,
-              lng: 78.9629,
+          <FaTruck
+            style={{
+              fontSize: "36px",
+              marginBottom: "10px",
             }}
-            defaultZoom={5}
-            mapId="DEMO_MAP_ID"
-          >
-
-            {/* Always show the route if there's a running trip */}
-            {runningTrip && (
-              <RouteDisplay
-                trip={runningTrip}
-                vehicleId={runningVehicle?.id}
-                vehicleLocation={vehicleLocation}
-                onProgressChange={handleProgressChange}
-                simulationRunning={simulationRunning}
-                onSimulationComplete={() => setSimulationRunning(false)}
-              />
-            )}
-
-            {/* Show actual vehicle location if available */}
-            {runningTrip && vehicleLocation && (
-              <VehicleLocationMarker
-                location={vehicleLocation}
-                vehicleNumber={runningTrip.vehicle_number}
-              />
-            )}
-
-          </Map>
-
-        </APIProvider>
-
-      </div>
-
-
-      {/* ==============================================
-          TRACKING PANEL
-          ============================================== */}
-
-      {runningTrip && (
-
-        <div className="tracking-panel">
-
-          <h3>
-            Vehicle Tracking
-          </h3>
-
-
-          {/* Vehicle */}
-
-          <div className="tracking-row">
-
-            <span>
-              Vehicle
-            </span>
-
-            <strong>
-              {runningTrip.vehicle_number}
-            </strong>
-
-          </div>
-
-
-          {/* Driver */}
-
-          <div className="tracking-row">
-
-            <span>
-              Driver
-            </span>
-
-            <strong>
-              {runningTrip.driver_name}
-            </strong>
-
-          </div>
-
-
-          {/* Status */}
-
-          <div className="tracking-row">
-
-            <span>
-              Status
-            </span>
-
-            <strong className="tracking-status">
-
-              🟢 {runningTrip.status}
-
-            </strong>
-
-          </div>
-
-
-          {/* Route */}
-
-          <div className="tracking-row">
-
-            <span>
-              Route
-            </span>
-
-            <strong>
-
-              {runningTrip.source}
-
-              {" → "}
-
-              {runningTrip.destination}
-
-            </strong>
-
-          </div>
-
-
-          {/* Location Status */}
-
-          <div className="tracking-row">
-
-            <span>
-              Location
-            </span>
-
-            <strong>
-              {loadingLocation ? (
-                "Loading..."
-              ) : locationError ? (
-                <span style={{ color: "#f97316" }}>
-                  ⚠️ {locationError}
-                </span>
-              ) : vehicleLocation ? (
-                <span style={{ color: "#22c55e" }}>
-                  ✅ Live GPS
-                </span>
-              ) : (
-                "No location data"
-              )}
-            </strong>
-
-          </div>
-
-
-          {/* Coordinates */}
-
-          {vehicleLocation && (
-            <div className="tracking-row">
-
-              <span>
-                Coordinates
-              </span>
-
-              <strong style={{ fontSize: "13px" }}>
-                {vehicleLocation.latitude.toFixed(6)}°,{" "}
-                {vehicleLocation.longitude.toFixed(6)}°
-              </strong>
-
-            </div>
-          )}
-
-
-          {/* ==========================================
-              GPS SIMULATION CONTROLS
-              ========================================== */}
+          />
 
           <div
             style={{
-              display: "flex",
-              gap: "10px",
-              marginTop: "15px",
-              marginBottom: "15px",
+              fontWeight: "600",
+              color: "#334155",
             }}
           >
-
-            <button
-              className="btn"
-              onClick={() => setSimulationRunning(true)}
-              disabled={simulationRunning}
-            >
-              🚛 Start Simulation
-            </button>
-
-            <button
-              className="btn"
-              onClick={() => setSimulationRunning(false)}
-              disabled={!simulationRunning}
-            >
-              ⏹ Stop Simulation
-            </button>
-
+            No active trip
           </div>
 
+          <div
+            style={{
+              fontSize: "13px",
+              marginTop: "4px",
+            }}
+          >
+            Start a trip from Fleet Manager
+            to begin tracking.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-          {/* Simulation Status */}
+  return (
+    <>
+      {/* =================================================
+          MAP
+          ================================================= */}
 
+      <div
+        className="google-map-container"
+        style={{
+          width: "100%",
+          height: "420px",
+          minHeight: "420px",
+          borderRadius: "12px",
+          overflow: "hidden",
+        }}
+      >
+        <APIProvider
+          apiKey={
+            import.meta.env
+              .VITE_GOOGLE_MAPS_API_KEY
+          }
+        >
+          <Map
+            center={mapCenter}
+            zoom={7}
+            mapId="DEMO_MAP_ID"
+            gestureHandling="greedy"
+          >
+            <RouteLine />
+
+            {vehicleLocation && (
+              <VehicleMarker
+                location={vehicleLocation}
+                vehicleNumber={
+                  runningVehicle?.registration_number ||
+                  `Vehicle #${runningTrip.vehicle_id}`
+                }
+              />
+            )}
+          </Map>
+        </APIProvider>
+      </div>
+
+      {/* =================================================
+          TRACKING PANEL
+          ================================================= */}
+
+      <div className="tracking-panel">
+
+        <h3>
+          Vehicle Tracking
+        </h3>
+
+        <div className="tracking-row">
+          <span>Vehicle</span>
+
+          <strong>
+            {runningVehicle?.registration_number ||
+              `Vehicle #${runningTrip.vehicle_id}`}
+          </strong>
+        </div>
+
+        <div className="tracking-row">
+          <span>Driver</span>
+
+          <strong>
+            {runningTrip.driver_name ||
+              `Driver #${runningTrip.driver_id}`}
+          </strong>
+        </div>
+
+        <div className="tracking-row">
+          <span>Status</span>
+
+          <strong
+            className="tracking-status"
+          >
+            🟢 {runningTrip.status}
+          </strong>
+        </div>
+
+        <div className="tracking-row">
+          <span>Route</span>
+
+          <strong>
+            Trichy → Chennai
+          </strong>
+        </div>
+
+        <div className="tracking-row">
+          <span>Location</span>
+
+          <strong>
+            {vehicleLocation ? (
+              <span
+                style={{
+                  color: "#22c55e",
+                }}
+              >
+                ● Live GPS
+              </span>
+            ) : (
+              <span
+                style={{
+                  color: "#f97316",
+                }}
+              >
+                ⚠ Waiting for GPS
+              </span>
+            )}
+          </strong>
+        </div>
+
+        {vehicleLocation && (
           <div className="tracking-row">
+            <span>Coordinates</span>
+
+            <strong
+              style={{
+                fontSize: "13px",
+              }}
+            >
+              {Number(
+                vehicleLocation.latitude
+              ).toFixed(6)}
+              °,{" "}
+              {Number(
+                vehicleLocation.longitude
+              ).toFixed(6)}
+              °
+            </strong>
+          </div>
+        )}
+
+        {/* =================================================
+            CONTROLS
+            ================================================= */}
+
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            marginTop: "15px",
+            marginBottom: "15px",
+          }}
+        >
+          <button
+            className="btn"
+            onClick={startSimulation}
+            disabled={simulationRunning}
+          >
+            🚛 Start Simulation
+          </button>
+
+          <button
+            className="btn"
+            onClick={stopSimulation}
+            disabled={!simulationRunning}
+          >
+            ⏹ Stop Simulation
+          </button>
+        </div>
+
+        {/* =================================================
+            SIMULATION STATUS
+            ================================================= */}
+
+        <div className="tracking-row">
+          <span>Simulation</span>
+
+          <strong>
+            {simulationRunning ? (
+              <span
+                style={{
+                  color: "#22c55e",
+                }}
+              >
+                🟢 Running
+              </span>
+            ) : (
+              <span
+                style={{
+                  color: "#6b7280",
+                }}
+              >
+                ⚪ Stopped
+              </span>
+            )}
+          </strong>
+        </div>
+
+        {/* =================================================
+            PROGRESS
+            ================================================= */}
+
+        <div className="tracking-progress">
+
+          <div className="tracking-progress-header">
 
             <span>
-              Simulation
+              Trip Progress
             </span>
 
             <strong>
-              {simulationRunning ? (
-                <span style={{ color: "#22c55e" }}>
-                  🟢 Running
-                </span>
-              ) : (
-                <span style={{ color: "#6b7280" }}>
-                  ⚪ Stopped
-                </span>
-              )}
+              {progress}%
             </strong>
 
           </div>
 
+          <div className="progress-bar">
 
-          {/* ==========================================
-              PROGRESS
-              ========================================== */}
-
-          <div className="tracking-progress">
-
-            <div className="tracking-progress-header">
-
-              <span>
-                Trip Progress
-              </span>
-
-              <strong>
-                {progress}%
-              </strong>
-
-            </div>
-
-
-            <div className="progress-bar">
-
-              <div
-                className="progress-fill"
-                style={{
-                  width: `${progress}%`,
-                }}
-              />
-
-            </div>
+            <div
+              className="progress-fill"
+              style={{
+                width: `${progress}%`,
+              }}
+            />
 
           </div>
 
         </div>
 
-      )}
-
+      </div>
     </>
   );
 }
-
 
 export default GoogleMap;
